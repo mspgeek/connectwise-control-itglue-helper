@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExtensionManifest>
+    <Version>1.1.101</Version>
+    <Name>Extension Developer (Clone)</Name>
+    <Author>ConnectWise Labs</Author>
+    <ShortDescription>Development suite for Extensions. Create, edit, and publish your own Extensions.</ShortDescription>
+    <Components>
+        <HelpProviderDefinition SourceFile="ITGlue.html" MinProductVersionInclusive="6.1" />
+    </Components>
+</ExtensionManifest>

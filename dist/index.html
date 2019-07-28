@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>CWC-ITGlue</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-shim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-sham.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.34.2/es6-shim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.34.2/es6-sham.min.js"></script>
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/es7-shim/6.0.0/es7-shim.min.js"></script>-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header navbar-brand">
+                ITGlue Helper
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid hidden" id="login-form">
+        <div class="col-xs-6 col-xs-offset-2">
+            <div id="login-alert" class="alert alert-warning alert-dismissible hidden">
+                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                <p></p>
+            </div>
+            <div class="page-header">Login</div>
+            <form class="form-group-xs">
+                <div class="form-group">
+                    <label class="control-label">
+                        <input name="companyUrl" type="text" placeholder="Company URL" class="form-control">
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">
+                        <input name="email" type="text" placeholder="Email" class="form-control">
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">
+                        <input name="password" type="password" placeholder="Password" class="form-control">
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">
+                        <input name="otp" type="password" placeholder="MFA Code" class="form-control">
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary" id="login-button">Log in</button>
+            </form>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <p>results:</p>
+        <div id="results"></div>
+        <p>state:</p>
+        <div id="state-log"></div>
+    </div>
+    <button class="btn btn-danger" id="clear-local-storage">Clear Local Settings (dev only)</button>
+</div>
+<script type="text/javascript" src="main.js"></script></body>
+</html>
