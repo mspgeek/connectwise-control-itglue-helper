@@ -21,11 +21,12 @@ State.prototype.emit = function (eventName, eventData) {
 };
 
 State.prototype.setState = function (newState) {
+  const oldState = this.state;
   this.state = {
     ...this.state,
     ...newState,
   };
-  this.emit('change', this.state);
+  this.emit('change', {oldState, newState: this.state});
   console.log('state changed', this.state);
 };
 

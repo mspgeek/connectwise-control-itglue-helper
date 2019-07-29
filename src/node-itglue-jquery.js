@@ -41,7 +41,7 @@ const DELETE = 'delete';
 const BASE_URL = 'https://api.itglue.com';
 const BASE_URL_EU = 'https://api.eu.itglue.com';
 const BASE_URL_MOBILE = 'https://api-mobile-prod.itglue.com/api';
-const CORS_ANYWERE = 'https://cors-anywhere.herokuapp.com/';
+const CORS_ANYWHERE = 'https://cwc-cors.herokuapp.com/'; // I control this build
 
 const MODE_BEARER = 'bearer';
 const MODE_USER = 'user';
@@ -127,7 +127,7 @@ ITGlue.prototype.client = function ({path, params, body, method}) {
     };
 
     if (__DEV__ || __IE8TEST__) {
-      config.url = `${CORS_ANYWERE}${config.url}`;
+      config.url = `${CORS_ANYWHERE}${config.url}`;
       config.headers['x-requested-with'] = 'jquery';
     }
 
@@ -137,18 +137,16 @@ ITGlue.prototype.client = function ({path, params, body, method}) {
 
     console.log(config);
 
-    const request = $.ajax(config);
-    return Promise.race([
-      request.done(data => {
+    $.ajax(config)
+      .done(data => {
         return resolve(data);
-      }),
-      request.fail((jqXHR, textStatus) => {
+      })
+      .fail((jqXHR, textStatus) => {
         if (jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.error_message) {
           return reject(jqXHR.responseJSON.error_message);
         }
         return reject(`${jqXHR.status}/${textStatus}`);
-      }),
-    ]);
+      });
   });
 };
 

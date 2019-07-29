@@ -14,7 +14,7 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       __DEV__: false,
-      __IE8TEST__: true,
+      __IE8TEST__: false,
     }),
     // new webpack.ProvidePlugin({
     //   $: 'jquery',
@@ -24,7 +24,7 @@ module.exports = {
       inlineSource: '.(js)$',
       template: 'src/index.html',
     }),
-    // new HtmlWebpackInlineSourcePlugin(),
+    new HtmlWebpackInlineSourcePlugin(),
   ],
   module: {
     rules: [

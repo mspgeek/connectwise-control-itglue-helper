@@ -10,8 +10,7 @@ module.exports = {
   mode: 'development',
   entry: './src/app.js',
   externals: {
-    '$': 'jquery',
-    'jquery': 'jquery',
+    'jquery': 'jQuery',
   },
   plugins: [
     // new webpack.ProvidePlugin({
@@ -30,8 +29,8 @@ module.exports = {
   module: {
     rules: [{
       test: /\.(js|jsx)$/,
-      exclude: /node_modules/,
-      use: [{loader: 'babel-loader', options: babelOptions}, 'eslint-loader'],
+      exclude: /node_modules|libs/,
+      use: [{loader: 'babel-loader', options: babelOptions}, {loader: 'eslint-loader', options: {}}],
     }, {
       test: /\.less$/,
       use: [

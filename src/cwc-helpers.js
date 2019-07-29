@@ -3,7 +3,6 @@
 // import ITGlue from 'node-itglue'; // this module has un-polyfilled code and won't load on IE8
 import ITGlue from './node-itglue-jquery';  // this is a rewrite using jquery 1.12
 
-
 /**
  * Creates cookies
  * @param {string} cname Name of the cookie
@@ -12,8 +11,8 @@ import ITGlue from './node-itglue-jquery';  // this is a rewrite using jquery 1.
 export function setCookie(cname, cvalue) {
   try {
     if (__DEV__ || __IE8TEST__) {
-      window.localStorage.setItem(name, value);
-      console.log('localStorage.setItem', name, value);
+      window.localStorage.setItem(cname, cvalue);
+      console.log('localStorage.setItem', cname, cvalue);
     } else {
       window.external.setSettingValue(cname, cvalue);
     }
@@ -31,8 +30,8 @@ export function getCookie(cname) {
   let value;
   try {
     if (__DEV__ || __IE8TEST__) {
-      console.log('localStorage.getItem', name);
-      value = window.localStorage.getItem(name);
+      console.log('localStorage.getItem', cname);
+      value = window.localStorage.getItem(cname);
     } else {
       value = window.external.getSettingValue(cname);
     }
@@ -50,8 +49,8 @@ export function getCookie(cname) {
 export function deleteCookie(cname) {
   try {
     if (__DEV__ || __IE8TEST__) {
-      window.localStorage.setItem(name, '');
-      console.log('localStorage.setItem', name, value);
+      window.localStorage.setItem(cname, '');
+      console.log('localStorage.setItem', cname, '');
     } else {
       window.external.setSettingValue(cname, '');
     }
@@ -110,5 +109,43 @@ export function verifyToken(token) {
     });
 }
 
+export function getOrganizations(token) {
+  const itg = new ITGlue({
+    mode: 'bearer',
+    token,
+  });
 
+  return itg.get({
+    path: '/organizations',
+    params: {
+      'page[size]': 1000,
+      'filter[psa_integration_type]': 'manage',
+    },
+  });
+}
 
+export function getOrganizationPasswords(token, id) {
+  const itg = new ITGlue({
+    mode: 'bearer',
+    token,
+  });
+
+  return itg.get({
+    path: `/organizations/${id}/relationships/passwords`,
+    params: {
+      'page[size]': 1000,
+      'page[number]': 1,
+      'sort': 'name',
+    },
+  });
+}
+
+export function getPassword(token, orgId, id) {
+  const itg = new ITGlue({
+    mode: 'bearer',
+    token,
+  });
+
+  return itg.get({path: `/organizations/${orgId}/relationships/passwords/${id}`})
+    .then(result => result.data);
+}
