@@ -1,7 +1,6 @@
 /* global __DEV__ */
-/* global __IE8TEST__ */
-// import ITGlue from 'node-itglue'; // this module has un-polyfilled code and won't load on IE8
-import ITGlue from './node-itglue-jquery';  // this is a rewrite using jquery 1.12
+import ITGlue from 'node-itglue';
+import {SETTING_TOKEN} from './strings';
 
 /**
  * Creates cookies
@@ -10,7 +9,7 @@ import ITGlue from './node-itglue-jquery';  // this is a rewrite using jquery 1.
  */
 export function setCookie(cname, cvalue) {
   try {
-    if (__DEV__ || __IE8TEST__) {
+    if (__DEV__) {
       window.localStorage.setItem(cname, cvalue);
       console.log('localStorage.setItem', cname, cvalue);
     } else {
@@ -29,7 +28,7 @@ export function setCookie(cname, cvalue) {
 export function getCookie(cname) {
   let value;
   try {
-    if (__DEV__ || __IE8TEST__) {
+    if (__DEV__) {
       console.log('localStorage.getItem', cname);
       value = window.localStorage.getItem(cname);
     } else {
@@ -48,7 +47,7 @@ export function getCookie(cname) {
  */
 export function deleteCookie(cname) {
   try {
-    if (__DEV__ || __IE8TEST__) {
+    if (__DEV__) {
       window.localStorage.setItem(cname, '');
       console.log('localStorage.setItem', cname, '');
     } else {
@@ -61,7 +60,7 @@ export function deleteCookie(cname) {
 
 export function sendCredentials(username, password) {
   try {
-    if (__DEV__ || __IE8TEST__) {
+    if (__DEV__) {
       alert(`send credentials: ${username}:${password}`);
     } else {
       window.external.sendCredentials(null, username, password);
@@ -70,6 +69,15 @@ export function sendCredentials(username, password) {
     //Do something: Tried worked on local but didn't work on live :(
   }
 }
+
+export function saveToken(token) {
+  setCookie(SETTING_TOKEN, token);
+}
+
+export function getSavedToken() {
+  return getCookie(SETTING_TOKEN);
+}
+
 
 /**
  * @param companyUrl
@@ -121,7 +129,13 @@ export function getOrganizations(token) {
       'page[size]': 1000,
       'filter[psa_integration_type]': 'manage',
     },
-  });
+  })
+  // make the data returned usable
+    .then(results => results.data.map(org => ({
+      orgId: org.id,
+      name: org.attributes.name,
+      shortName: org.attributes['short-name'],
+    })));
 }
 
 export function getOrganizationPasswords(token, id) {
@@ -137,7 +151,14 @@ export function getOrganizationPasswords(token, id) {
       'page[number]': 1,
       'sort': 'name',
     },
-  });
+  })
+    .then(results => results.data.map((password) => ({
+      passwordId: password.id,
+      orgId: password.attributes['organization-id'],
+      name: password.attributes.name,
+      username: password.attributes.username,
+      category: password.attributes['password-category-name'],
+    })));
 }
 
 export function getPassword(token, orgId, id) {
