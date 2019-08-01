@@ -10,7 +10,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 import {connect} from 'react-redux';
 
-import {loadOrganizations, selectOrganization} from '../redux/organizations';
+import {loadOrganizations, loadOrganizationSearch, selectOrganization} from '../redux/organizations';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -266,7 +266,7 @@ Menu.propTypes = {
   /**
    * Props to be passed to the menu wrapper.
    */
-  innerProps: PropTypes.object.isRequired,
+  innerProps: PropTypes.object,
   selectProps: PropTypes.object.isRequired,
 };
 
@@ -283,18 +283,12 @@ function OrganizationSelect(props) {
   const classes = useStyles();
   const theme = useTheme();
   const {organizationsLoading, organizationsLoadingError, organizationsLoaded} = props;
-
+  const [searchTimeout, setSearchTimeout] = React.useState(undefined);
+  const [searchCallback, setSearchCallback] = React.useState(undefined);
 
   function handleChangeSingle(value) {
     props.selectOrganization(value);
   }
-
-  React.useEffect(() => {
-    // load available organizations
-    if (!organizationsLoading && !organizationsLoaded && !organizationsLoadingError) {
-      props.loadOrganizations();
-    }
-  });
 
   const selectStyles = {
     input: base => ({
@@ -306,7 +300,25 @@ function OrganizationSelect(props) {
     }),
   };
 
-  const suggestions = props.organizations.map(org => ({value: org.orgId, label: org.shortName}));
+  React.useEffect(() => {
+    if (props.searchLoaded && !props.searchLoading && searchCallback) {
+      searchCallback(props.searchResults);
+    }
+  });
+
+  const promiseOptions = (inputValue, callback) => {
+    // set a timeout delay before firing to let the user finish typing
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    setSearchCallback(() => callback);
+
+    console.log('waiting...');
+    setSearchTimeout(setTimeout(() => {
+      console.log('done waiting');
+      props.loadOrganizationSearch(inputValue);
+    }, 400));
+  };
 
   return (
     <div className={classes.root}>
@@ -315,15 +327,15 @@ function OrganizationSelect(props) {
         styles={selectStyles}
         inputId="organization-select"
         TextFieldProps={{
-          label: 'Organization Short Name',
+          label: 'Organization',
           InputLabelProps: {
             htmlFor: 'organization-select',
             shrink: true,
           },
         }}
-        options={suggestions}
+        loadOptions={promiseOptions}
         components={components}
-        value={props.selectedOrganization}
+        // value={props.selectedOrganization}
         onChange={handleChangeSingle}
       />
     </div>
@@ -334,12 +346,18 @@ OrganizationSelect.propTypes = {
   // actions
   loadOrganizations: PropTypes.func,
   selectOrganization: PropTypes.func,
+  loadOrganizationSearch: PropTypes.func,
 
   // state
   organizationsLoading: PropTypes.bool,
   organizationsLoadingError: PropTypes.object,
   organizationsLoaded: PropTypes.bool,
   selectedOrganization: PropTypes.object,
+
+  // search state
+  searchResults: PropTypes.array,
+  searchLoading: PropTypes.bool,
+  searchLoaded: PropTypes.bool,
 
   // values
   organizations: PropTypes.array,
@@ -352,4 +370,6 @@ OrganizationSelect.defaultProps = {
   selectedOrganization: undefined,
 };
 
-export default connect(state => ({...state.organizations}), {loadOrganizations, selectOrganization})(OrganizationSelect);
+export default connect(
+  state => ({...state.organizations}),
+  {loadOrganizations, selectOrganization, loadOrganizationSearch})(OrganizationSelect);

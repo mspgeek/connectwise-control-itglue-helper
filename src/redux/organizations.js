@@ -1,12 +1,12 @@
-import {getOrganizations} from '../helpers';
+import {getOrganizations, searchOrganization} from '../helpers';
 
 const GET_ORGANIZATIONS = 'organizations/GET_ORGANIZATIONS';
 const GET_ORGANIZATIONS_SUCCESS = 'organizations/GET_ORGANIZATIONS_SUCCESS';
 const GET_ORGANIZATIONS_FAIL = 'organizations/GET_ORGANIZATIONS_FAIL';
 
-const GET_ORG_PASSWORDS = 'organizations/GET_ORG_PASSWORDS';
-const GET_ORG_PASSWORDS_SUCCESS = 'organizations/GET_ORG_PASSWORDS_SUCCESS';
-const GET_ORG_PASSWORDS_FAIL = 'organizations/GET_ORG_PASSWORDS_FAIL';
+const ORGANIZATION_SEARCH = 'organizations/ORGANIZATION_SEARCH';
+const ORGANIZATION_SEARCH_SUCCESS = 'organizations/ORGANIZATION_SEARCH_SUCCESS';
+const ORGANIZATION_SEARCH_FAIL = 'organizations/ORGANIZATION_SEARCH_FAIL';
 
 const SELECT_ORGANIZATION = 'organizations/SELECT_ORGANIZATION';
 
@@ -17,6 +17,12 @@ const initialState = {
   organizationsLoaded: false,
   organizationsLoadingError: undefined,
   selectedOrganization: undefined, // stored as {value, label}
+
+  // search values
+  searchLoading: false,
+  searchLoaded: false,
+  searchLoadingError: undefined,
+  searchResults: [],
 };
 
 export default function reducer(state = initialState, action = {}) {
@@ -50,6 +56,30 @@ export default function reducer(state = initialState, action = {}) {
         ...state,
         selectedOrganization: action.orgId,
       };
+    case ORGANIZATION_SEARCH:
+      return {
+        ...state,
+        searchLoading: true,
+        searchLoaded: false,
+        searchLoadingError: undefined,
+        searchResults: [],
+      };
+    case ORGANIZATION_SEARCH_SUCCESS:
+      return {
+        ...state,
+        searchLoading: false,
+        searchLoaded: true,
+        searchLoadingError: undefined,
+        searchResults: action.result,
+      };
+    case ORGANIZATION_SEARCH_FAIL:
+      return {
+        ...state,
+        searchLoading: false,
+        searchLoaded: false,
+        searchLoadingError: action.error,
+        searchResults: [],
+      };
     default:
       return state;
   }
@@ -66,13 +96,19 @@ export function loadOrganizations() {
   };
 }
 
-export function loadOrganizationPasswords(token, orgId) {
-
-}
-
 export function selectOrganization(orgId) {
   return {
     type: SELECT_ORGANIZATION,
     orgId,
+  };
+}
+
+export function loadOrganizationSearch(searchText) {
+  return (dispatch, getState) => {
+    const {auth: {user: {server}, token}} = getState();
+    return dispatch({
+      types: [ORGANIZATION_SEARCH, ORGANIZATION_SEARCH_SUCCESS, ORGANIZATION_SEARCH_FAIL],
+      promise: searchOrganization(server, token, searchText),
+    });
   };
 }
