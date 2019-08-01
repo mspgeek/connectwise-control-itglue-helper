@@ -9,7 +9,7 @@ let initialState = getStore();
 
 console.log('saved state: ', initialState);
 
-if (!initialState.auth.loggedIn) {
+if (!initialState || (initialState && initialState.auth && !initialState.auth.loggedIn)) {
   initialState = {};
 }
 
