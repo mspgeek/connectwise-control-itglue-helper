@@ -1,9 +1,24 @@
-import {createStore, applyMiddleware} from 'redux';
+import {createStore, applyMiddleware, compose} from 'redux';
 import {composeWithDevTools} from 'redux-devtools-extension';
 import reducer from './reducer';
-import middleware from './middleware';
+import {promiseThunkMiddleware, errorHandler} from './middleware';
+import {getStore} from '../helpers';
 
-export default function create(initialState = {}) {
+// load saved state
+let initialState = getStore();
+
+console.log('saved state: ', initialState);
+
+if (!initialState.auth.loggedIn) {
+  initialState = {};
+}
+
+const middleware = [promiseThunkMiddleware(), errorHandler()];
+
+export default function create() {
   console.log('initial state: ', initialState);
-  return createStore(reducer, initialState, composeWithDevTools(applyMiddleware(middleware())));
+  return createStore(
+    reducer,
+    initialState,
+    composeWithDevTools(applyMiddleware(...middleware)));
 }

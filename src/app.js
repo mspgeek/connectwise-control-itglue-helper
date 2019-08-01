@@ -10,15 +10,7 @@ import {getSavedToken} from './helpers';
 import create from './redux/create';
 
 // load from localSettings
-const store = create({
-  auth: {
-    token: getSavedToken(),
-  },
-  alert: {},
-  organizations: {},
-  passwords: {},
-});
-
+const store = create();
 
 const App = () => <Provider store={store}><Home/></Provider>;
 
