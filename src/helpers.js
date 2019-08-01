@@ -1,6 +1,6 @@
 /* global __DEV__ */
 import ITGlue from 'node-itglue';
-import {SETTING_TOKEN} from './strings';
+import {SETTING_TOKEN, SETTING_REDUX} from './strings';
 
 /**
  * Creates cookies
@@ -76,6 +76,22 @@ export function saveToken(token) {
 
 export function getSavedToken() {
   return getCookie(SETTING_TOKEN);
+}
+
+export function deleteToken() {
+  deleteCookie(SETTING_TOKEN);
+}
+
+export function saveStore(store) {
+  setCookie(SETTING_REDUX, JSON.stringify(store));
+}
+
+export function getStore() {
+  try {
+    return JSON.parse(getCookie(SETTING_REDUX));
+  } catch (err) {
+    return {};
+  }
 }
 
 
