@@ -13,6 +13,7 @@ import OrganizationSelect from '../Components/OrganizationSelect';
 
 import {checkToken} from '../redux/auth';
 import PasswordsList from '../Components/PasswordsList';
+import AppBarHeader from '../Components/AppBarHeader';
 
 const theme = createMuiTheme();
 
@@ -31,11 +32,10 @@ function Home(props) {
     <ThemeProvider theme={theme}>
       <CssBaseline/>
       <Container maxWidth="lg">
+        <AppBarHeader/>
+        <Alert/>
         {!loggedIn &&
-        <div>
-          <Alert/>
-          <Login/>
-        </div>}
+        <Login/>}
         {loggedIn && <div>
           <OrganizationSelect/>
           {selectedOrganization && <PasswordsList/>}

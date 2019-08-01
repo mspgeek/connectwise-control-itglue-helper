@@ -6,6 +6,8 @@ const CORS_ANYWHERE = 'https://cwc-cors.herokuapp.com/';
 import ITGlue from 'node-itglue';
 import {saveToken, verifyToken} from '../helpers';
 
+const LOGOUT = 'auth/LOGOUT';
+
 const LOGIN = 'auth/LOGIN';
 const LOGIN_SUCCESS = 'auth/LOGIN_SUCCESS';
 const LOGIN_FAIL = 'auth/LOGIN_FAIL';
@@ -97,6 +99,9 @@ export default function reducer(state = initialState, action = {}) {
         loggedIn: false,
         token: undefined,
       };
+    case LOGOUT:
+      saveToken('');
+      return initialState;
     default:
       return state;
   }
@@ -148,5 +153,11 @@ export function setAuth(name, value) {
     type: SET_AUTH,
     name,
     value,
+  };
+}
+
+export function logout() {
+  return {
+    type: LOGOUT,
   };
 }
