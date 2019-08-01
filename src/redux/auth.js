@@ -1,10 +1,4 @@
-/* global __CORS_ANYWHERE__ */
-import Login from '../Components/Login';
-
-const CORS_ANYWHERE = 'https://cwc-cors.herokuapp.com/';
-
-import ITGlue from 'node-itglue';
-import {saveToken, verifyToken} from '../helpers';
+import {saveToken, verifyToken, getItGlueJsonWebToken, clearStore} from '../helpers';
 
 const LOGOUT = 'auth/LOGOUT';
 
@@ -100,7 +94,6 @@ export default function reducer(state = initialState, action = {}) {
         token: undefined,
       };
     case LOGOUT:
-      saveToken('');
       return initialState;
     default:
       return state;
@@ -111,25 +104,9 @@ export function login() {
   return (dispatch, getState) => {
     const {server, otp, email, password} = getState().auth.user;
 
-    const config = {
-      mode: 'user',
-      companyUrl: server,
-      user: {
-        email,
-        password,
-        otp,
-      },
-    };
-
-    if (__CORS_ANYWHERE__) {
-      config.companyUrl = `${CORS_ANYWHERE}${config.companyUrl}`;
-    }
-
-    const itg = new ITGlue(config);
-
     return dispatch({
       types: [LOGIN, LOGIN_SUCCESS, LOGIN_FAIL],
-      promise: itg.getItGlueJsonWebToken({email, password, otp}),
+      promise: getItGlueJsonWebToken(server, otp, email, password),
     });
   };
 }
@@ -157,6 +134,8 @@ export function setAuth(name, value) {
 }
 
 export function logout() {
+  clearStore();
+  saveToken('');
   return {
     type: LOGOUT,
   };
