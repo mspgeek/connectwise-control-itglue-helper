@@ -222,13 +222,13 @@ function EnhancedTable(props) {
                       key={row.name}
                     >
                       {headRows.map((header, idx) => {
-                        console.log('head rows: ', header);
+                        const key = `${labelId}-${idx}`;
                         if (idx === 0) {
-                          return <TableCell component="th" id={labelId} scope="row">{row[header.id]}</TableCell>;
+                          return <TableCell key={key} component="th" id={labelId} scope="row">{row[header.id]}</TableCell>;
                         } else if (header.render) {
-                          return header.render(row);
+                          return <TableCell key={key} align="center">{header.render(row)}</TableCell>;
                         }
-                        return <TableCell key={labelId} align="left">{row[header.id]}</TableCell>;
+                        return <TableCell key={key} align="left">{row[header.id]}</TableCell>;
                       })}
                     </TableRow>
                   );
