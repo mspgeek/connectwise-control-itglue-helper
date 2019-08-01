@@ -32,3 +32,9 @@ export function showAlert(message) {
     message,
   };
 }
+
+export function dismissAlert() {
+  return {
+    type: ALERT_HIDE,
+  };
+}
