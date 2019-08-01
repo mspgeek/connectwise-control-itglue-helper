@@ -4,13 +4,13 @@ import Button from '@material-ui/core/Button';
 import {connect} from 'react-redux';
 
 import EnhancedTable from './EnhancedTable';
-import {loadOrganizationPasswords} from '../redux/passwords.js';
+import {loadOrganizationPasswords, loadPassword} from '../redux/passwords.js';
 
 
 function PasswordsList(props) {
   const {passwords, passwordsLoaded, passwordsLoading, passwordsLoadError} = props;
 
-  const buttonRender = (row) => <Button variant="outlined" onClick={() => handleButtonClick(row.id)}>Send</Button>;
+  const buttonRender = (row) => <Button variant="outlined" onClick={() => handleButtonClick(row.passwordId, row.orgId)}>Send</Button>;
 
   // name, username, category
   const headRows = [
@@ -22,9 +22,8 @@ function PasswordsList(props) {
   ];
 
 
-  function handleButtonClick(passwordId) {
-    // dispatch a thing
-    alert(`blargh ${passwordId}`);
+  function handleButtonClick(passwordId, orgId) {
+    props.loadPassword(orgId, passwordId);
   }
 
   React.useEffect(() => {
@@ -47,6 +46,7 @@ function PasswordsList(props) {
 PasswordsList.propTypes = {
   // actions
   loadOrganizationPasswords: PropTypes.func,
+  loadPassword: PropTypes.func,
 
   passwords: PropTypes.array,
   passwordsLoaded: PropTypes.bool,
@@ -61,5 +61,4 @@ PasswordsList.defaultProps = {
   passwordsLoadError: false,
 };
 
-
-export default connect(state => ({...state.passwords}), {loadOrganizationPasswords})(PasswordsList);
+export default connect(state => ({...state.passwords}), {loadOrganizationPasswords, loadPassword})(PasswordsList);

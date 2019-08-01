@@ -1,6 +1,11 @@
 /* global __DEV__ */
+/* global __CORS_ANYWHERE__ */
+
 import ITGlue from 'node-itglue';
 import {SETTING_TOKEN, SETTING_REDUX} from './strings';
+import filter from 'lodash/filter';
+
+const CORS_ANYWHERE = 'https://cwc-cors.herokuapp.com/';
 
 /**
  * Creates cookies
@@ -11,7 +16,7 @@ export function setCookie(cname, cvalue) {
   try {
     if (__DEV__) {
       window.localStorage.setItem(cname, cvalue);
-      console.log('localStorage.setItem', cname, cvalue);
+      // console.log('localStorage.setItem', cname, cvalue);
     } else {
       window.external.setSettingValue(cname, cvalue);
     }
@@ -29,7 +34,7 @@ export function getCookie(cname) {
   let value;
   try {
     if (__DEV__) {
-      console.log('localStorage.getItem', cname);
+      // console.log('localStorage.getItem', cname);
       value = window.localStorage.getItem(cname);
     } else {
       value = window.external.getSettingValue(cname);
@@ -90,8 +95,12 @@ export function getStore() {
   try {
     return JSON.parse(getCookie(SETTING_REDUX));
   } catch (err) {
-    return {};
+    return undefined;
   }
+}
+
+export function clearStore() {
+  setCookie(SETTING_REDUX, '');
 }
 
 
@@ -177,12 +186,64 @@ export function getOrganizationPasswords(token, id) {
     })));
 }
 
-export function getPassword(token, orgId, id) {
+export function getPassword(token, orgId, passwordId) {
   const itg = new ITGlue({
     mode: 'bearer',
     token,
   });
 
-  return itg.get({path: `/organizations/${orgId}/relationships/passwords/${id}`})
+  return itg.get({path: `/organizations/${orgId}/relationships/passwords/${passwordId}`})
     .then(result => result.data);
+}
+
+export function getAndSendPassword(token, orgId, passwordId) {
+  return getPassword(token, orgId, passwordId)
+    .then(result => {
+      console.log('result is', result);
+      const {username, password} = result.attributes;
+      sendCredentials(username, password);
+      return result;
+    });
+}
+
+export function searchOrganization(companyUrl, token, searchText) {
+  const config = {
+    companyUrl,
+    token,
+    mode: 'user-bearer',
+  };
+
+  if (__CORS_ANYWHERE__) {
+    config.companyUrl = config.companyUrl = `${CORS_ANYWHERE}${config.companyUrl}`;
+  }
+  const itg = new ITGlue(config);
+
+  return itg.search({query: searchText, limit: 25})
+    .then(result => filter(result, el => el.class === 'organization'))
+    .then(result => result.map(org => ({
+      orgId: org.id,
+      name: org.name,
+      shortName: org.short_name,
+    })))
+    .then(result => result.map(org => ({value: org.orgId, label: org.shortName})));
+}
+
+export function getItGlueJsonWebToken(server, otp, email, password) {
+  const config = {
+    mode: 'user',
+    companyUrl: server,
+    user: {
+      email,
+      password,
+      otp,
+    },
+  };
+
+  if (__CORS_ANYWHERE__) {
+    config.companyUrl = `${CORS_ANYWHERE}${config.companyUrl}`;
+  }
+
+  const itg = new ITGlue(config);
+
+  return itg.getItGlueJsonWebToken({email, password, otp});
 }
