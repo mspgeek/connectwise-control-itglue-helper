@@ -27,12 +27,21 @@ function Alert(props) {
   const classes = useStyles();
   const {message, show} = props;
 
+  let messageClean = message;
+  if (typeof message === 'object') {
+    if (message.message) {
+      messageClean = message.message;
+    } else {
+      messageClean = JSON.stringify(message);
+    }
+  }
+
   return (
     <div>
       {show &&
       <Paper className={classes.paper}>
         <Typography variant="body1" className={classes.typography}>
-          {message}
+          {messageClean}
         </Typography>
         <IconButton onClick={props.dismissAlert}>
           <IconDismiss/>
