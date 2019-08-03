@@ -1,5 +1,5 @@
 /* global __DEV__ */
-import {saveStore} from '../helpers';
+import {saveStore, saveTokenFromStore} from '../helpers';
 import {showAlert} from '../redux/alert';
 
 export function promiseThunkMiddleware() {
@@ -12,9 +12,10 @@ export function promiseThunkMiddleware() {
 
     // @TODO save state to local storage?
     // put after thunking middleware
-    if (__DEV__) {
-      saveStore(getState());
-    }
+
+    saveStore(getState());
+    saveTokenFromStore(getState());
+
 
     if (!promise) {
       return next(action);

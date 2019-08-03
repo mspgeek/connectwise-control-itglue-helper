@@ -1,4 +1,8 @@
-import {saveToken, verifyToken, getItGlueJsonWebToken, clearStore} from '../helpers';
+import {saveToken, verifyToken, getItGlueJsonWebToken, clearStore, getSavedToken} from '../helpers';
+import {reset as resetAlert} from './alert';
+import {reset as resetOrgs} from './organizations';
+import {reset as resetPasswords} from './passwords';
+import {reset as resetSearch} from './search';
 
 const LOGOUT = 'auth/LOGOUT';
 
@@ -13,10 +17,12 @@ const LOGIN_TOKEN = 'auth/LOGIN_TOKEN';
 const LOGIN_TOKEN_SUCCESS = 'auth/LOGIN_TOKEN_SUCCESS';
 const LOGIN_TOKEN_FAIL = 'auth/LOGIN_TOKEN_FAIL';
 
+const RESET = 'auth/RESET';
+
 
 const initialState = {
   user: {
-    server: '',
+    subdomain: '',
     otp: '',
     email: '',
     password: '',
@@ -25,7 +31,7 @@ const initialState = {
   loginError: undefined,
   loggedIn: false,
 
-  token: undefined,
+  token: getSavedToken(),
 };
 
 export default function reducer(state = initialState, action = {}) {
@@ -94,7 +100,15 @@ export default function reducer(state = initialState, action = {}) {
         token: undefined,
       };
     case LOGOUT:
-      return initialState;
+      return {
+        ...initialState,
+        token: undefined,
+      };
+    case RESET:
+      return {
+        ...initialState,
+        token: undefined,
+      };
     default:
       return state;
   }
@@ -102,11 +116,11 @@ export default function reducer(state = initialState, action = {}) {
 
 export function login() {
   return (dispatch, getState) => {
-    const {server, otp, email, password} = getState().auth.user;
+    const {subdomain, otp, email, password} = getState().auth.user;
 
     return dispatch({
       types: [LOGIN, LOGIN_SUCCESS, LOGIN_FAIL],
-      promise: getItGlueJsonWebToken(server, otp, email, password),
+      promise: getItGlueJsonWebToken(subdomain, otp, email, password),
     });
   };
 }
@@ -136,7 +150,24 @@ export function setAuth(name, value) {
 export function logout() {
   clearStore();
   saveToken('');
+  return (dispatch) => {
+    dispatch({type: LOGOUT});
+  };
+}
+
+export function reset() {
   return {
-    type: LOGOUT,
+    type: RESET,
+  };
+}
+
+export function resetAll() {
+  saveToken('');
+  return (dispatch) => {
+    dispatch(resetAlert());
+    dispatch(resetOrgs());
+    dispatch(resetPasswords());
+    dispatch(resetSearch());
+    dispatch(reset());
   };
 }

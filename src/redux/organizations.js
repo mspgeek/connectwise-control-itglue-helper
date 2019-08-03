@@ -1,4 +1,4 @@
-import {getOrganizations, searchOrganization} from '../helpers';
+import {loadOrganizationPasswords} from './passwords';
 
 const GET_ORGANIZATIONS = 'organizations/GET_ORGANIZATIONS';
 const GET_ORGANIZATIONS_SUCCESS = 'organizations/GET_ORGANIZATIONS_SUCCESS';
@@ -9,6 +9,7 @@ const ORGANIZATION_SEARCH_SUCCESS = 'organizations/ORGANIZATION_SEARCH_SUCCESS';
 const ORGANIZATION_SEARCH_FAIL = 'organizations/ORGANIZATION_SEARCH_FAIL';
 
 const SELECT_ORGANIZATION = 'organizations/SELECT_ORGANIZATION';
+const RESET = 'organizations/RESET';
 
 const initialState = {
   organizations: [],
@@ -16,7 +17,7 @@ const initialState = {
   organizationsLoading: false,
   organizationsLoaded: false,
   organizationsLoadingError: undefined,
-  selectedOrganization: undefined, // stored as {value, label}
+  selectedOrganization: undefined,
 
   // search values
   searchLoading: false,
@@ -27,88 +28,31 @@ const initialState = {
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
-    case GET_ORGANIZATIONS:
-      return {
-        ...state,
-        organizations: [],
-        organizationsLoading: true,
-        organizationsLoaded: false,
-        organizationsLoadingError: undefined,
-      };
-    case GET_ORGANIZATIONS_SUCCESS:
-      return {
-        ...state,
-        organizations: action.result,
-        organizationsLoading: false,
-        organizationsLoaded: true,
-        organizationsLoadingError: undefined,
-      };
-    case GET_ORGANIZATIONS_FAIL:
-      return {
-        ...state,
-        organizations: [],
-        organizationsLoading: false,
-        organizationsLoaded: false,
-        organizationsLoadingError: action.error,
-      };
     case SELECT_ORGANIZATION:
       return {
         ...state,
-        selectedOrganization: action.orgId,
+        selectedOrganization: action.organization,
       };
-    case ORGANIZATION_SEARCH:
-      return {
-        ...state,
-        searchLoading: true,
-        searchLoaded: false,
-        searchLoadingError: undefined,
-        searchResults: [],
-      };
-    case ORGANIZATION_SEARCH_SUCCESS:
-      return {
-        ...state,
-        searchLoading: false,
-        searchLoaded: true,
-        searchLoadingError: undefined,
-        searchResults: action.result,
-      };
-    case ORGANIZATION_SEARCH_FAIL:
-      return {
-        ...state,
-        searchLoading: false,
-        searchLoaded: false,
-        searchLoadingError: action.error,
-        searchResults: [],
-      };
+    case RESET:
+      return initialState;
     default:
       return state;
   }
 }
 
-export function loadOrganizations() {
-  return (dispatch, getState) => {
-    const token = getState().auth.token;
-
-    return dispatch({
-      types: [GET_ORGANIZATIONS, GET_ORGANIZATIONS_SUCCESS, GET_ORGANIZATIONS_FAIL],
-      promise: getOrganizations(token),
+export function selectOrganization(organization) {
+  return (dispatch) => {
+    dispatch({
+      type: SELECT_ORGANIZATION,
+      organization,
     });
+    dispatch(loadOrganizationPasswords());
   };
 }
 
-export function selectOrganization(orgId) {
+export function reset() {
   return {
-    type: SELECT_ORGANIZATION,
-    orgId,
+    type: RESET,
   };
-}
 
-export function loadOrganizationSearch(searchText) {
-  return (dispatch, getState) => {
-    const {auth: {user: {server}, token}} = getState();
-    return dispatch({
-      types: [ORGANIZATION_SEARCH, ORGANIZATION_SEARCH_SUCCESS, ORGANIZATION_SEARCH_FAIL],
-      promise: searchOrganization(server, token, searchText),
-    });
-  };
 }
