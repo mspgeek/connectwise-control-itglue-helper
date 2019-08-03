@@ -26,11 +26,11 @@ function PasswordsList(props) {
     props.loadPassword(orgId, passwordId);
   }
 
-  React.useEffect(() => {
-    if (!passwordsLoaded && !passwordsLoading && !passwordsLoadError) {
-      props.loadOrganizationPasswords();
-    }
-  });
+  // React.useEffect(() => {
+  //   if (!passwordsLoaded && !passwordsLoading && !passwordsLoadError) {
+  //     props.loadOrganizationPasswords();
+  //   }
+  // });
 
   return (
     <div>
