@@ -17,11 +17,7 @@ export default function reducer(state = initialState, action = {}) {
         show: true,
       };
     case ALERT_HIDE:
-      return {
-        ...state,
-        message: '',
-        show: false,
-      };
+      return initialState;
     case RESET:
       return initialState;
     default:
