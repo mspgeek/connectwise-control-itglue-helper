@@ -1,5 +1,5 @@
 import {saveToken, verifyToken, getItGlueJsonWebToken, clearStore, getSavedToken} from '../helpers';
-import {reset as resetAlert} from './alert';
+import {reset as resetAlert, dismissAlert} from './alert';
 import {reset as resetOrgs} from './organizations';
 import {reset as resetPasswords} from './passwords';
 import {reset as resetSearch} from './search';
@@ -120,7 +120,11 @@ export function login() {
 
     return dispatch({
       types: [LOGIN, LOGIN_SUCCESS, LOGIN_FAIL],
-      promise: getItGlueJsonWebToken(subdomain, otp, email, password),
+      promise: getItGlueJsonWebToken(subdomain, otp, email, password)
+        .then((token) => {
+          dispatch(dismissAlert());
+          return token;
+        }),
     });
   };
 }
