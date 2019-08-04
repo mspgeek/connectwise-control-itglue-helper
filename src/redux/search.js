@@ -21,7 +21,7 @@ const initialState = {
   searchLoading: false,
   searchLoaded: false,
 
-  showSearchResult: false,
+  searchResultOpen: false,
   // the context in which to search
   // 'global' => use /search.json
   // 'organization' => filter passwords
@@ -73,12 +73,12 @@ export default function reducer(state = initialState, action = {}) {
     case HIDE_SEARCH_RESULT:
       return {
         ...state,
-        showSearchResult: false,
+        searchResultOpen: false,
       };
     case SHOW_SEARCH_RESULT:
       return {
         ...state,
-        showSearchResult: true,
+        searchResultOpen: true,
       };
     case RESET:
       return initialState;
