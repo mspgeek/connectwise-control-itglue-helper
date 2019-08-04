@@ -64,5 +64,6 @@ Size of the helper when moused over:
 - add error handling for pretty much everything
 - add bindings from intermediate states during loading where applicable
 - ~~change login form to use 'subdomain' instead of full domain~~
-- log out on 401 error (see redux middleware)
-- fix SearchSelect timeout to prevent duplicate searches running
+- ~~log out on 401 error (see redux middleware)~~
+- ~~fix SearchSelect timeout to prevent duplicate searches running~~
+- add remember me
