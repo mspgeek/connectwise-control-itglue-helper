@@ -1,16 +1,17 @@
 {
   "name": "connectwise-control-itglue-helper",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha2",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --open --hot --mode development --config webpack-dev.config.js",
     "build": "webpack --config webpack.config.js --mode production",
     "release": "node build-release.js"
   },
+  "browser": "src/app.js",
   "keywords": [],
   "author": "Kevin Grube",
   "license": "MIT",
+  "repository": "https://github.com/mspgeek/connectwise-control-itglue-helper.git",
   "dependencies": {
     "@babel/plugin-transform-runtime": "^7.5.5",
     "@babel/runtime-corejs3": "^7.5.5",
@@ -18,7 +19,6 @@
     "@material-ui/icons": "^4.2.1",
     "@material-ui/styles": "^4.3.0",
     "clipboard-copy": "^3.1.0",
-    "clsx": "^1.0.4",
     "lodash": "^4.17.15",
     "node-itglue": "^0.4.1",
     "prop-types": "^15.7.2",
