@@ -1,6 +1,8 @@
 /* global __DEV__ */
 import {saveStore, saveTokenFromStore} from '../helpers';
 import {showAlert} from '../redux/alert';
+import {logout} from '../redux/auth';
+import isArray from 'lodash/isArray';
 
 export function promiseThunkMiddleware() {
   return ({dispatch, getState}) => next => action => {
@@ -31,8 +33,17 @@ export function promiseThunkMiddleware() {
         next({...rest, result: result[0], type: SUCCESS});
       })
       .catch(error => {
-        next({...rest, error, type: FAILURE});
-        console.error('MIDDLEWARE ERROR', error);
+        let raisedError = error;
+        if (isArray(error)) {
+          raisedError = error[0];
+        }
+        next({...rest, error: raisedError, type: FAILURE});
+
+        if (raisedError.status === 401) {
+          dispatch(logout());
+        }
+
+        console.error('MIDDLEWARE ERROR', raisedError);
       });
   };
 }
