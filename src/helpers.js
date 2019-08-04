@@ -186,8 +186,13 @@ export function getOrganizationPasswords(token, id) {
     },
   })
     .then(results => results.data.map((password) => ({
-      passwordId: password.id,
+      // shape match
+      // class, class_name, id, name, username, hint, organization_name
+      id: password.id,
+      class: 'password',
+      class_name: 'Password',
       orgId: password.attributes['organization-id'],
+      organization_name: password.attributes['organization-nam'],
       name: password.attributes.name,
       username: password.attributes.username,
       category: password.attributes['password-category-name'],
