@@ -1,37 +1,67 @@
-import {loadOrganizationPasswords} from './passwords';
+import filter from 'lodash/filter';
+import {getOrganizationPasswords} from '../helpers';
 
-const GET_ORGANIZATIONS = 'organizations/GET_ORGANIZATIONS';
-const GET_ORGANIZATIONS_SUCCESS = 'organizations/GET_ORGANIZATIONS_SUCCESS';
-const GET_ORGANIZATIONS_FAIL = 'organizations/GET_ORGANIZATIONS_FAIL';
+const GET_ORG_PASSWORDS = 'organizations/GET_ORG_PASSWORDS';
+const GET_ORG_PASSWORDS_SUCCESS = 'organizations/GET_ORG_PASSWORDS_SUCCESS';
+const GET_ORG_PASSWORDS_FAIL = 'organizations/GET_ORG_PASSWORDS_FAIL';
 
-const ORGANIZATION_SEARCH = 'organizations/ORGANIZATION_SEARCH';
-const ORGANIZATION_SEARCH_SUCCESS = 'organizations/ORGANIZATION_SEARCH_SUCCESS';
-const ORGANIZATION_SEARCH_FAIL = 'organizations/ORGANIZATION_SEARCH_FAIL';
-
+const SET_PASSWORD_SEARCH_TEXT = 'organizations/SET_PASSWORD_SEARCH_TEXT';
+const FILTER_PASSWORDS = 'organization/FILTER_PASSWORDS';
 const SELECT_ORGANIZATION = 'organizations/SELECT_ORGANIZATION';
 const RESET = 'organizations/RESET';
 
 const initialState = {
-  organizations: [],
-  passwords: [],
-  organizationsLoading: false,
-  organizationsLoaded: false,
-  organizationsLoadingError: undefined,
   selectedOrganization: undefined,
+  passwordSearchText: '',
 
-  // search values
-  searchLoading: false,
-  searchLoaded: false,
-  searchLoadingError: undefined,
-  searchResults: [],
+  // passwords
+  passwordsLoading: false,
+  passwordsLoaded: false,
+  passwordsLoadError: undefined,
+  organizationPasswords: [],
+  filteredPasswords: [],
 };
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
-    case SELECT_ORGANIZATION:
+    case GET_ORG_PASSWORDS:
       return {
         ...state,
+        passwordsLoading: true,
+        passwordsLoaded: false,
+        passwordsLoadError: undefined,
+        organizationPasswords: [],
+      };
+    case GET_ORG_PASSWORDS_SUCCESS:
+      return {
+        ...state,
+        passwordsLoading: false,
+        passwordsLoaded: true,
+        passwordsLoadError: undefined,
+        organizationPasswords: action.result,
+      };
+    case GET_ORG_PASSWORDS_FAIL:
+      return {
+        ...state,
+        passwordsLoading: false,
+        passwordsLoaded: false,
+        passwordsLoadError: undefined,
+        organizationPasswords: [],
+      };
+    case SET_PASSWORD_SEARCH_TEXT:
+      return {
+        ...state,
+        passwordSearchText: action.passwordSearchText,
+      };
+    case SELECT_ORGANIZATION:
+      return {
+        ...initialState,
         selectedOrganization: action.organization,
+      };
+    case FILTER_PASSWORDS:
+      return {
+        ...state,
+        filteredPasswords: action.filteredPasswords,
       };
     case RESET:
       return initialState;
@@ -41,12 +71,50 @@ export default function reducer(state = initialState, action = {}) {
 }
 
 export function selectOrganization(organization) {
-  return (dispatch) => {
-    dispatch({
-      type: SELECT_ORGANIZATION,
-      organization,
+  return {
+    type: SELECT_ORGANIZATION,
+    organization,
+  };
+}
+
+
+export function loadOrganizationPasswords() {
+  return (dispatch, getState) => {
+    const state = getState();
+    const {auth: {token}, organizations: {selectedOrganization: {id}}} = state;
+
+    return dispatch({
+      types: [GET_ORG_PASSWORDS, GET_ORG_PASSWORDS_SUCCESS, GET_ORG_PASSWORDS_FAIL],
+      promise: getOrganizationPasswords(token, id),
     });
-    dispatch(loadOrganizationPasswords());
+  };
+}
+
+export function setPasswordSearchText(passwordSearchText) {
+  return {
+    type: SET_PASSWORD_SEARCH_TEXT,
+    passwordSearchText,
+  };
+}
+
+export function filterPasswords(passwordSearchText) {
+  return (dispatch, getState) => {
+    const {organizations: {organizationPasswords}} = getState();
+    if (!passwordSearchText) {
+      return dispatch({
+        type: FILTER_PASSWORDS,
+        filteredPasswords: organizationPasswords.concat(),
+      });
+    }
+
+    const filteredPasswords = filter(organizationPasswords, elem => {
+      return elem.name.toLocaleLowerCase().indexOf(passwordSearchText) > -1;
+    });
+
+    dispatch({
+      type: FILTER_PASSWORDS,
+      filteredPasswords,
+    });
   };
 }
 
@@ -54,5 +122,4 @@ export function reset() {
   return {
     type: RESET,
   };
-
 }

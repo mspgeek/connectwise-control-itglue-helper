@@ -9,7 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import {makeStyles} from '@material-ui/styles';
 
 import DetailPassword from './DetailPassword';
-import PasswordsList from './PasswordsList';
+import OrganizationPasswords from './OrganizationPasswords';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -29,7 +29,7 @@ function SearchResultDetail(props) {
       />
       }
       {selectedType === 'organization' &&
-      <PasswordsList/>
+      <OrganizationPasswords/>
       }
     </Paper>
   );
