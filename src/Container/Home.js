@@ -6,13 +6,14 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import {connect} from 'react-redux';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 
 import Login from '../Components/Login';
 import Alert from '../Components/Alert';
 
 import {checkToken} from '../redux/auth';
 import AppBarHeader from '../Components/AppBarHeader';
-import ResultsDisplay from '../Components/SearchResultsList';
+import SearchResultsList from '../Components/SearchResultsList';
 import SearchResultDetail from '../Components/SearchResultDetail';
 
 const theme = createMuiTheme({
@@ -28,9 +29,26 @@ const theme = createMuiTheme({
   },
 });
 
+const useStyles = makeStyles((currentTheme) => ({
+  containerRoot: {
+    padding: currentTheme.spacing(0, 1),
+  },
+}));
+
 
 function Home(props) {
-  const {loggedIn, token, loginPending, user: {subdomain}, selectedItem, showSearchResult} = props;
+  const {
+    loggedIn,
+    token,
+    loginPending,
+    user: {subdomain},
+    selectedItem,
+    searchResultOpen,
+    searchLoaded,
+    searchLoading,
+    searchResults,
+  } = props;
+  const classes = useStyles();
 
   useEffect(() => {
     // if there's a saved token, check if it's valid
@@ -43,13 +61,18 @@ function Home(props) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline/>
-      <Container maxWidth="xl">
-        <AppBarHeader/>
+      <AppBarHeader/>
+      <Container maxWidth="xl" className={classes.containerRoot}>
         <Alert/>
         {!loggedIn &&
         <Login/>}
-        {loggedIn && showSearchResult &&
-        <ResultsDisplay/>}
+        {loggedIn &&
+        <SearchResultsList
+          searchResultOpen={searchResultOpen}
+          searchResults={searchResults}
+          searchLoading={searchLoading}
+          searchLoaded={searchLoaded}
+        />}
         {loggedIn && selectedItem &&
         <SearchResultDetail/>}
       </Container>
@@ -64,8 +87,12 @@ Home.propTypes = {
   // state
   loggedIn: PropTypes.bool,
   loginPending: PropTypes.bool,
-  showSearchResult: PropTypes.bool,
+  searchResultOpen: PropTypes.bool,
+  searchLoading: PropTypes.bool,
+  searchLoaded: PropTypes.bool,
 
+  // values
+  searchResults: PropTypes.array,
   user: PropTypes.object,
   token: PropTypes.string,
   selectedItem: PropTypes.object,
@@ -75,12 +102,15 @@ Home.defaultProps = {
   loggedIn: false,
   loginPending: false,
   token: undefined,
-  showSearchResult: false,
+  searchResultOpen: false,
   selectedOrganization: undefined,
 };
 
 export default connect(state => ({
   ...state.auth,
   selectedItem: state.search.selectedItem,
-  showSearchResult: state.search.showSearchResult,
+  searchResultOpen: state.search.searchResultOpen,
+  searchResults: state.search.searchResults,
+  searchLoading: state.search.searchLoading,
+  searchLoaded: state.search.searchLoaded,
 }), {checkToken})(hot(Home));

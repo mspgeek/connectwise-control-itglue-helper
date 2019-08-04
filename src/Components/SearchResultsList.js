@@ -9,9 +9,9 @@ import Paper from '@material-ui/core/Paper';
 import MenuList from '@material-ui/core/MenuList';
 import {connect} from 'react-redux';
 import {makeStyles} from '@material-ui/core';
-import {hideSearchResult, selectItem} from '../redux/search';
-import {selectOrganization} from '../redux/organizations';
-import {loadOrganizationPasswords, loadPasswordById, selectPasswordId} from '../redux/passwords';
+import {hideSearchResult, selectItem, showSearchResult} from '../redux/search';
+import {selectOrganization, loadOrganizationPasswords} from '../redux/organizations';
+import {loadPasswordById, selectPasswordId} from '../redux/passwords';
 import {showAlert} from '../redux/alert';
 
 const useStyles = makeStyles(theme => ({
@@ -30,6 +30,14 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
   },
   resultList: {
+    [theme.breakpoints.only('xs')]: {
+      'overflowY': 'scroll',
+      height: 500,
+    },
+    [theme.breakpoints.only('sm')]: {
+      'overflowY': 'scroll',
+      height: 300,
+    },
     padding: theme.spacing(0, 1),
   },
 }));
@@ -61,6 +69,7 @@ function SearchResultsList(props) {
     // call action
     if (item.class === 'organization') {
       props.selectOrganization(item);
+      props.loadOrganizationPasswords(item);
     } else if (item.class === 'password') {
       props.selectPasswordId(item.id);
       props.loadPasswordById(item);
@@ -70,6 +79,10 @@ function SearchResultsList(props) {
     }
     props.hideSearchResult();
     props.selectItem(item);
+  }
+
+  if (!props.searchResultOpen) {
+    return null;
   }
 
   return (
@@ -102,10 +115,10 @@ function SearchResultsList(props) {
 }
 
 SearchResultsList.propTypes = {
-  searchResults: PropTypes.array,
-  searchLoading: PropTypes.bool,
-  searchLoaded: PropTypes.bool,
-
+  searchResultOpen: PropTypes.bool.isRequired,
+  searchResults: PropTypes.array.isRequired,
+  searchLoading: PropTypes.bool.isRequired,
+  searchLoaded: PropTypes.bool.isRequired,
 
   // actions
   showAlert: PropTypes.func,
@@ -117,8 +130,14 @@ SearchResultsList.propTypes = {
   loadPasswordById: PropTypes.func,
 };
 
+SearchResultsList.defaultProps = {
+  showSearchResult: false,
+  searchResults: [],
+};
+
 export default connect(
-  state => ({...state.search}),
+  // state => ({...state.search})
+  null,
   {
     selectItem,
     hideSearchResult,
