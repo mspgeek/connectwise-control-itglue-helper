@@ -6,8 +6,10 @@ const webpackConfig = require('./webpack.config');
 
 // delete stage and release
 try {
-  fs.unlinkSync(path.join(__dirname, '/stage/ITGlue.html'));
   fs.unlinkSync(path.join(__dirname, '/release/release.zip'));
+  fs.unlinkSync(path.join(__dirname, '/stage/ITGlue.html'));
+  fs.unlinkSync(path.join(__dirname, '/stage/manifest.xml'));
+  fs.unlinkSync(path.join(__dirname, '/stage/Promote.png'));
 } catch (e) {
 }
 
@@ -19,6 +21,8 @@ webpack(webpackConfig, (err, stats) => {
 
   // copy new build to stage
   fs.copyFileSync(path.join(__dirname, '/dist/ITGlue.html'), path.join(__dirname, '/stage/ITGlue.html'));
+  fs.copyFileSync(path.join(__dirname, '/src/extension/manifest.xml'), path.join(__dirname, '/stage/manifest.xml'));
+  fs.copyFileSync(path.join(__dirname, '/src/extension/Promote.png'), path.join(__dirname, '/stage/Promote.png'));
 
   buildZip();
 });
