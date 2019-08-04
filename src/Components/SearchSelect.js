@@ -50,18 +50,21 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function SearchSelect(props) {
-  const [searchTimeout, setSearchTimeout] = React.useState(undefined);
+  const [searchTimeout, setSearchTimeout] = React.useState([]);
 
   function handleChange(event) {
     // check if they're still typing, delete the last request if so
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
+    if (searchTimeout.length > 0) {
+      searchTimeout.forEach(id => clearTimeout(id));
     }
 
     const searchText = event.target.value;
     props.setSearchText(searchText);
 
-    setSearchTimeout(setTimeout(() => props.loadSearch(searchText), 150));
+    setSearchTimeout([...searchTimeout, setTimeout(() => {
+      props.loadSearch(searchText);
+      setSearchTimeout([]);
+    }, 150)]);
   }
 
   function startNewSearch() {
