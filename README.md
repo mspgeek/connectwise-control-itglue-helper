@@ -4,6 +4,7 @@
 
 - Download latest release
 - Extract zip to `C:\Program Files (x86)\ScreenConnect\App_Extensions`
+- Enable extension in web console
 
 #### Prerequisites
 - On-prem (?). 
