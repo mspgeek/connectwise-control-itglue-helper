@@ -22,7 +22,7 @@ function SearchResultDetail(props) {
   const {selectedItem, selectedType} = props;
   const classes = useStyles();
   return (
-    <Paper className={classes.root}>
+    <Paper square className={classes.root}>
       {selectedType === 'password' &&
       <DetailPassword
         password={selectedItem}

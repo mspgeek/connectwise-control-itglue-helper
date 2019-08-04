@@ -13,6 +13,7 @@ import {hideSearchResult, selectItem, showSearchResult} from '../redux/search';
 import {selectOrganization, loadOrganizationPasswords} from '../redux/organizations';
 import {loadPasswordById, selectPasswordId} from '../redux/passwords';
 import {showAlert} from '../redux/alert';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 const useStyles = makeStyles(theme => ({
   loading: {
@@ -39,6 +40,15 @@ const useStyles = makeStyles(theme => ({
       height: 300,
     },
     padding: theme.spacing(0, 1),
+  },
+  progressRoot: {
+    display: 'flex',
+    justifyContent: 'center',
+    height: theme.spacing(8),
+    alignItems: 'center',
+  },
+  progress: {
+    flexGrow: 1,
   },
 }));
 
@@ -87,13 +97,15 @@ function SearchResultsList(props) {
 
   return (
     <Paper square>
+      {searchLoading &&
+      <div className={classes.progressRoot}>
+        <LinearProgress className={classes.progress}/>
+      </div>
+      }
+      {!searchLoading && searchLoaded &&
       <MenuList
         className={classes.resultList}
       >
-        {searchLoading &&
-        <MenuItem className={classes.loading} disabled>
-          <Typography>Search Loading...</Typography>
-        </MenuItem>}
         {searchLoaded && searchResults.length > 0 && searchResults.map((item, idx) => {
           const label = `${item.label}-${idx}`;
           return (
@@ -110,6 +122,7 @@ function SearchResultsList(props) {
           <Typography>No results</Typography>
         </MenuItem>}
       </MenuList>
+      }
     </Paper>
   );
 }
