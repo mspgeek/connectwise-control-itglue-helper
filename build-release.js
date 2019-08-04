@@ -4,8 +4,16 @@ const archiver = require('archiver');
 const webpack = require('webpack');
 const webpackConfig = require('./webpack.config');
 
-// delete stage and release
+// create stage and release folders
+// delete stage and release files
 try {
+  if (!fs.existsSync(path.join(__dirname, '/stage'))) {
+    fs.mkdirSync(path.join(__dirname, '/stage'));
+  }
+  if (!fs.existsSync(path.join(__dirname, '/release'))) {
+    fs.mkdirSync(path.join(__dirname, '/release'));
+  }
+
   fs.unlinkSync(path.join(__dirname, '/release/release.zip'));
   fs.unlinkSync(path.join(__dirname, '/stage/ITGlue.html'));
   fs.unlinkSync(path.join(__dirname, '/stage/manifest.xml'));
