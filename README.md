@@ -1,5 +1,10 @@
 # connectwise-control-itglue-helper
 
+Install Prerequisites
+```
+> npm install
+```
+
 Build
 ```
 > npm run build
