@@ -1,35 +1,37 @@
 {
   "name": "connectwise-control-itglue-helper",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha2",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --open --hot --mode development --config webpack-dev.config.js",
-    "build": "webpack --config webpack.config.js --mode production"
+    "build": "webpack --config webpack.config.js --mode production",
+    "release": "node build-release.js"
   },
+  "browser": "src/app.js",
   "keywords": [],
   "author": "Kevin Grube",
   "license": "MIT",
+  "repository": "https://github.com/mspgeek/connectwise-control-itglue-helper.git",
   "dependencies": {
     "@babel/plugin-transform-runtime": "^7.5.5",
     "@babel/runtime-corejs3": "^7.5.5",
     "@material-ui/core": "^4.3.0",
     "@material-ui/icons": "^4.2.1",
     "@material-ui/styles": "^4.3.0",
-    "clsx": "^1.0.4",
+    "clipboard-copy": "^3.1.0",
     "lodash": "^4.17.15",
-    "node-itglue": "^0.4.0",
+    "node-itglue": "^0.4.1",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.1.0",
-    "react-select": "^3.0.4",
     "redux": "^4.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
+    "archiver": "^3.1.1",
     "babel-eslint": "^10.0.2",
     "babel-loader": "^8.0.6",
     "clean-webpack-plugin": "^3.0.0",

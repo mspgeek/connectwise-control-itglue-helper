@@ -1,68 +1,61 @@
 /* global __DEV__ */
 /* global __CORS_ANYWHERE__ */
-
-import ITGlue from 'node-itglue';
-import {SETTING_TOKEN, SETTING_REDUX} from './strings';
 import filter from 'lodash/filter';
+import ITGlue from 'node-itglue';
 
-const CORS_ANYWHERE = 'https://cwc-cors.herokuapp.com/';
+import {SETTING_TOKEN, SETTING_REDUX, CORS_ANYWHERE} from './strings';
 
 /**
- * Creates cookies
- * @param {string} cname Name of the cookie
- * @param {string} cvalue Cookie value
+ * @param {string} key
+ * @param {string} value
  */
-export function setCookie(cname, cvalue) {
+export function setSCSettingValue(key, value) {
   try {
     if (__DEV__) {
-      window.localStorage.setItem(cname, cvalue);
-      // console.log('localStorage.setItem', cname, cvalue);
+      window.localStorage.setItem(key, value);
     } else {
-      window.external.setSettingValue(cname, cvalue);
+      window.external.setSettingValue(key, value);
     }
   } catch (e) {
-    //Do something: Tried worked on local but didn't work on live :(
+    console.error('setSCSettingValue', e);
   }
 }
 
 
 /**
- * Get cookies
- * @param {string} cname Name of the cookie
+ * @param {string} key
  */
-export function getCookie(cname) {
+export function getSCSettingValue(key) {
   let value;
   try {
     if (__DEV__) {
-      // console.log('localStorage.getItem', cname);
-      value = window.localStorage.getItem(cname);
+      value = window.localStorage.getItem(key);
     } else {
-      value = window.external.getSettingValue(cname);
+      value = window.external.getSettingValue(key);
     }
   } catch (e) {
-    //Do something: Tried worked on local but didn't work on live :(
+    console.error('getSCSettingValue', e);
   }
   return value;
 }
 
 
 /**
- * Delete cookie
- * @param {string} cname Cookie value
+ * @param {string} key
  */
-export function deleteCookie(cname) {
+export function deleteSCSettingValue(key) {
   try {
     if (__DEV__) {
-      window.localStorage.setItem(cname, '');
-      console.log('localStorage.setItem', cname, '');
+      window.localStorage.setItem(key, '');
     } else {
-      window.external.setSettingValue(cname, '');
+      window.external.setSettingValue(key, '');
     }
   } catch (e) {
-    //Do something: Tried worked on local but didn't work on live :(
+    console.error('deleteSCSettingValue', e);
   }
 }
 
+// @TODO first argument is domain, parse domain?
 export function sendCredentials(username, password) {
   try {
     if (__DEV__) {
@@ -71,53 +64,72 @@ export function sendCredentials(username, password) {
       window.external.sendCredentials(null, username, password);
     }
   } catch (e) {
-    //Do something: Tried worked on local but didn't work on live :(
+  }
+}
+
+export function sendText(text) {
+  try {
+    if (__DEV__) {
+      alert(`typing text ${text}`);
+    } else {
+      window.external.sendText(text);
+    }
+  } catch (e) {
+
   }
 }
 
 export function saveToken(token) {
-  setCookie(SETTING_TOKEN, token);
+  setSCSettingValue(SETTING_TOKEN, token);
 }
 
 export function getSavedToken() {
-  return getCookie(SETTING_TOKEN);
+  console.log('getSavedToken');
+  return getSCSettingValue(SETTING_TOKEN);
 }
 
 export function deleteToken() {
-  deleteCookie(SETTING_TOKEN);
+  deleteSCSettingValue(SETTING_TOKEN);
 }
 
 export function saveStore(store) {
-  setCookie(SETTING_REDUX, JSON.stringify(store));
+  // @TODO this doesn't work live
+  // this is too big?
+  setSCSettingValue(SETTING_REDUX, JSON.stringify(store));
+}
+
+export function saveTokenFromStore(store) {
+  const {auth: {token}} = store;
+  setSCSettingValue(SETTING_TOKEN, token);
 }
 
 export function getStore() {
   try {
-    return JSON.parse(getCookie(SETTING_REDUX));
+    return JSON.parse(getSCSettingValue(SETTING_REDUX));
   } catch (err) {
     return undefined;
   }
 }
 
 export function clearStore() {
-  setCookie(SETTING_REDUX, '');
+  setSCSettingValue(SETTING_REDUX, '');
 }
 
 
 /**
- * @param companyUrl
+ * @param subdomain
  * @param email
  * @param password
  * @param otp
  * @returns {Promise<{string}>} token
  */
-export function itgLogin(companyUrl, email, password, otp) {
+export function itgLogin(subdomain, email, password, otp) {
   const itg = new ITGlue({
     mode: 'user',
     user: {
       email, password, otp,
     },
-    companyUrl,
+    companyUrl: `https://${subdomain}.itglue.com`,
   });
 
   return itg.getItGlueJsonWebToken({email, password, otp});
@@ -134,12 +146,8 @@ export function verifyToken(token) {
   });
 
   return itg.get({path: '/organizations'})
-    .then(result => {
-      return true;
-    })
-    .catch(err => {
-      return false;
-    });
+    .then(() => true)
+    .catch(() => false);
 }
 
 export function getOrganizations(token) {
@@ -178,8 +186,13 @@ export function getOrganizationPasswords(token, id) {
     },
   })
     .then(results => results.data.map((password) => ({
-      passwordId: password.id,
+      // shape match
+      // class, class_name, id, name, username, hint, organization_name
+      id: password.id,
+      class: 'password',
+      class_name: 'Password',
       orgId: password.attributes['organization-id'],
+      organization_name: password.attributes['organization-nam'],
       name: password.attributes.name,
       username: password.attributes.username,
       category: password.attributes['password-category-name'],
@@ -196,6 +209,29 @@ export function getPassword(token, orgId, passwordId) {
     .then(result => result.data);
 }
 
+export function getPasswordById({token, passwordId}) {
+  const itg = new ITGlue({
+    mode: 'bearer',
+    token,
+  });
+
+  return itg.get({path: '/passwords', params: {'filter[id]': passwordId}})
+    .then(results => results.data[0])
+    .then(result => {
+      return getPassword(token, result.attributes['organization-id'], result.id)
+        .then(password => {
+          console.log('returned from get Password', password);
+          return {
+            ...result,
+            attributes: {
+              ...password.attributes,
+              ...result.attributes,
+            },
+          };
+        });
+    });
+}
+
 export function getAndSendPassword(token, orgId, passwordId) {
   return getPassword(token, orgId, passwordId)
     .then(result => {
@@ -206,15 +242,15 @@ export function getAndSendPassword(token, orgId, passwordId) {
     });
 }
 
-export function searchOrganization(companyUrl, token, searchText) {
+export function searchOrganization(subdomain, token, searchText) {
   const config = {
-    companyUrl,
+    companyUrl: `https://${subdomain}.itglue.com`,
     token,
     mode: 'user-bearer',
   };
 
   if (__CORS_ANYWHERE__) {
-    config.companyUrl = config.companyUrl = `${CORS_ANYWHERE}${config.companyUrl}`;
+    config.companyUrl = `${CORS_ANYWHERE}${config.companyUrl}`;
   }
   const itg = new ITGlue(config);
 
@@ -228,10 +264,10 @@ export function searchOrganization(companyUrl, token, searchText) {
     .then(result => result.map(org => ({value: org.orgId, label: org.shortName})));
 }
 
-export function getItGlueJsonWebToken(server, otp, email, password) {
+export function getItGlueJsonWebToken(subdomain, otp, email, password) {
   const config = {
     mode: 'user',
-    companyUrl: server,
+    companyUrl: `https://${subdomain}.itglue.com`,
     user: {
       email,
       password,
@@ -246,4 +282,26 @@ export function getItGlueJsonWebToken(server, otp, email, password) {
   const itg = new ITGlue(config);
 
   return itg.getItGlueJsonWebToken({email, password, otp});
+}
+
+export function getSearch(subdomain, token, searchText) {
+  const config = {
+    companyUrl: `https://${subdomain}.itglue.com`,
+    token,
+    mode: 'user-bearer',
+  };
+
+  if (__CORS_ANYWHERE__) {
+    config.companyUrl = `${CORS_ANYWHERE}${config.companyUrl}`;
+  }
+  const itg = new ITGlue(config);
+
+  return itg.search({query: searchText, limit: 10, kind: 'passwords,organizations'});
+  // .then(result => filter(result, el => el.class === 'organization'))
+  // .then(result => result.map(org => ({
+  //   orgId: org.id,
+  //   name: org.name,
+  //   shortName: org.short_name,
+  // })))
+  // .then(result => result.map(org => ({value: org.orgId, label: org.shortName})));
 }
