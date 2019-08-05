@@ -1,12 +1,12 @@
-import {getOrganizationPasswords, getAndSendPassword} from '../helpers';
-
-const GET_ORG_PASSWORDS = 'passwords/GET_ORG_PASSWORDS';
-const GET_ORG_PASSWORDS_SUCCESS = 'passwords/GET_ORG_PASSWORDS_SUCCESS';
-const GET_ORG_PASSWORDS_FAIL = 'passwords/GET_ORG_PASSWORDS_FAIL';
+import {getPassword, getPasswordById} from '../helpers';
 
 const GET_PASSWORD = 'passwords/GET_PASSWORD';
 const GET_PASSWORD_SUCCESS = 'passwords/GET_PASSWORD_SUCCESS';
 const GET_PASSWORD_FAIL = 'passwords/GET_PASSWORD_FAIL';
+
+const SELECT_PASSWORD = 'passwords/SELECT_PASSWORD';
+
+const RESET = 'passwords/RESET';
 
 const initialState = {
   passwords: [],
@@ -18,34 +18,19 @@ const initialState = {
   passwordLoaded: false,
   passwordLoading: false,
   passwordLoadError: undefined,
+
+  passwordId: undefined,
 };
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
-    case GET_ORG_PASSWORDS:
+    case SELECT_PASSWORD: {
       return {
-        ...state,
-        passwordsLoading: true,
-        passwordsLoaded: false,
-        passwordsLoadError: undefined,
-        passwords: [],
+        // reset to initial state
+        ...initialState,
+        passwordId: action.passwordId,
       };
-    case GET_ORG_PASSWORDS_SUCCESS:
-      return {
-        ...state,
-        passwordsLoading: false,
-        passwordsLoaded: true,
-        passwordsLoadError: undefined,
-        passwords: action.result,
-      };
-    case GET_ORG_PASSWORDS_FAIL:
-      return {
-        ...state,
-        passwordsLoading: false,
-        passwordsLoaded: false,
-        passwordsLoadError: undefined,
-        passwords: [],
-      };
+    }
     case GET_PASSWORD:
       return {
         ...state,
@@ -70,21 +55,11 @@ export default function reducer(state = initialState, action = {}) {
         passwordLoading: false,
         passwordLoadError: action.error,
       };
+    case RESET:
+      return initialState;
     default:
       return state;
   }
-}
-
-export function loadOrganizationPasswords() {
-  return (dispatch, getState) => {
-    const state = getState();
-    const {auth: {token}, organizations: {selectedOrganization}} = state;
-
-    return dispatch({
-      types: [GET_ORG_PASSWORDS, GET_ORG_PASSWORDS_SUCCESS, GET_ORG_PASSWORDS_FAIL],
-      promise: getOrganizationPasswords(token, selectedOrganization.value),
-    });
-  };
 }
 
 export function loadPassword(orgId, passwordId) {
@@ -92,7 +67,31 @@ export function loadPassword(orgId, passwordId) {
     const {auth: {token}} = getState();
     dispatch({
       types: [GET_PASSWORD, GET_PASSWORD_SUCCESS, GET_PASSWORD_FAIL],
-      promise: getAndSendPassword(token, orgId, passwordId),
+      promise: getPassword(token, orgId, passwordId),
     });
+  };
+}
+
+export function loadPasswordById(password) {
+  return (dispatch, getState) => {
+    const {auth: {token}} = getState();
+
+    dispatch({
+      types: [GET_PASSWORD, GET_PASSWORD_SUCCESS, GET_PASSWORD_FAIL],
+      promise: getPasswordById({token, passwordId: password.id}),
+    });
+  };
+}
+
+export function selectPasswordId(passwordId) {
+  return {
+    type: SELECT_PASSWORD,
+    passwordId,
+  };
+}
+
+export function reset() {
+  return {
+    type: RESET,
   };
 }

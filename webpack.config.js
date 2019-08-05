@@ -21,6 +21,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       inlineSource: '.(js)$',
+      filename: 'ITGlue.html',
       template: path.resolve('./src/index.html'),
     }),
     new HtmlWebpackInlineSourcePlugin(),

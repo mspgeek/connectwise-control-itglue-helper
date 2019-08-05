@@ -31,6 +31,11 @@ function Alert(props) {
   if (typeof message === 'object') {
     if (message.message) {
       messageClean = message.message;
+    } else if (message.title) {
+      messageClean = message.title;
+      if (message.detail) {
+        messageClean = `${messageClean} - ${message.detail}`;
+      }
     } else {
       messageClean = JSON.stringify(message);
     }
