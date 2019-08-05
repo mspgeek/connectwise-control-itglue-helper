@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
 import Avatar from '@material-ui/core/Avatar';
-import {withTheme, makeStyles} from '@material-ui/styles';
+import {makeStyles} from '@material-ui/styles';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import Grid from '@material-ui/core/Grid';
+import Hidden from '@material-ui/core/Hidden';
 
 import {setAuth, login} from '../redux/auth';
 import {connect} from 'react-redux';
@@ -20,6 +19,7 @@ const useStyles = makeStyles(theme => ({
   },
   paper: {
     marginTop: theme.spacing(1),
+    padding: theme.spacing(0, 2),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -44,77 +44,89 @@ function Login(props) {
     props.login();
   };
 
-  const {email, server, otp, password} = props;
+  const {email, subdomain, otp, password, loginPending} = props;
 
   const classes = useStyles();
   return (
     <div className={classes.paper}>
-      <Avatar className={classes.avatar}>
-        <LockOutlinedIcon/>
-      </Avatar>
+      <Hidden only={['sm']}>
+        <Avatar className={classes.avatar}>
+          <LockOutlinedIcon/>
+        </Avatar>
+      </Hidden>
       <form className={classes.form} noValidate onSubmit={handleSubmit}>
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          id="server"
-          label="Company URL"
-          autoComplete="server"
-          autoFocus
-          onChange={handleChange('server')}
-          value={server}
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          id="email"
-          label="Email Address"
-          name="email"
-          autoComplete="email"
-          onChange={handleChange('email')}
-          value={email}
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          name="password"
-          label="Password"
-          type="password"
-          id="password"
-          autoComplete="current-password"
-          onChange={handleChange('password')}
-          value={password}
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          name="otp"
-          label="MFA Code"
-          type="password"
-          id="otp"
-          onChange={handleChange('otp')}
-          value={otp}
-        />
-        {/*<FormControlLabel*/}
-        {/*  control={<Checkbox value="remember" color="primary"/>}*/}
-        {/*  label="Remember me"*/}
-        {/*/>*/}
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="primary"
-          className={classes.submit}
-        >
-          Sign In
-        </Button>
+        <Grid container spacing={1}>
+          <Grid item xs={12} sm={6} md={12}>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="subdomain"
+              label="Subdomain"
+              name="subdomain"
+              autoComplete="subdomain"
+              autoFocus
+              onChange={handleChange('subdomain')}
+              value={subdomain}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={12}>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              onChange={handleChange('email')}
+              value={email}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={12}>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              onChange={handleChange('password')}
+              value={password}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={12}>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="otp"
+              label="MFA Code"
+              type="password"
+              id="otp"
+              onChange={handleChange('otp')}
+              value={otp}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              disabled={loginPending}
+            >
+              Sign In
+            </Button>
+          </Grid>
+        </Grid>
       </form>
     </div>
   );
@@ -126,17 +138,24 @@ Login.propTypes = {
   login: PropTypes.func.isRequired,
 
   // values
-  server: PropTypes.string,
+  subdomain: PropTypes.string,
   email: PropTypes.string,
   password: PropTypes.string,
   otp: PropTypes.string,
+
+  // state
+  loginPending: PropTypes.bool,
+
 };
 
 Login.defaultProps = {
-  server: '',
+  subdomain: '',
   email: '',
   password: '',
   otp: '',
+  loginPending: false,
 };
 
-export default connect(state => ({...state.auth.user}), {setAuth, login})(Login);
+export default connect(
+  state => ({...state.auth.user, loginPending: state.auth.loginPending}),
+  {setAuth, login})(Login);

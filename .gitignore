@@ -91,4 +91,6 @@ typings/
 .idea
 scratch
 .babel
-
+stage
+release
+dist

@@ -2,23 +2,27 @@ import {createStore, applyMiddleware, compose} from 'redux';
 import {composeWithDevTools} from 'redux-devtools-extension';
 import reducer from './reducer';
 import {promiseThunkMiddleware, errorHandler} from './middleware';
-import {getStore} from '../helpers';
+import {getSavedToken, getStore} from '../helpers';
 
 // load saved state
-let initialState = getStore();
+const initialState = getStore();
 
-console.log('saved state: ', initialState);
+console.log('initialState', initialState);
 
-if (!initialState || (initialState && initialState.auth && !initialState.auth.loggedIn)) {
-  initialState = {};
-}
+// if ((initialState && initialState.auth) && !initialState.auth.loggedIn) {
+//   initialState = {};
+// }
 
 const middleware = [promiseThunkMiddleware(), errorHandler()];
 
 export default function create() {
-  console.log('initial state: ', initialState);
+  if (initialState) {
+    return createStore(
+      reducer,
+      initialState,
+      composeWithDevTools(applyMiddleware(...middleware)));
+  }
   return createStore(
     reducer,
-    initialState,
     composeWithDevTools(applyMiddleware(...middleware)));
 }
