@@ -67,7 +67,7 @@ export function loadPasswordById(passwordId) {
     const {auth: {token}} = getState();
     dispatch({
       types: [GET_PASSWORD, GET_PASSWORD_SUCCESS, GET_PASSWORD_FAIL],
-      promise: getPasswordById({token, passwordId, showPassword: true}),
+      promise: getPasswordById({token, passwordId, showPassword: false}),
     });
   };
 }

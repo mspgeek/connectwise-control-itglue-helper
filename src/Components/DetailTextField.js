@@ -38,7 +38,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function DetailTextField(props) {
-  const {value, label, type, showCopy, multiline} = props;
+  const {value, label, type, showCopy, multiline, wrapButtonClick} = props;
   const classes = useStyles();
   const [copyNotificationOpen, setCopyNotificationOpen] = React.useState(false);
 
@@ -46,19 +46,8 @@ function DetailTextField(props) {
     setCopyNotificationOpen(false);
   }
 
-  function wrapButtonClick({copyValue}) {
-    return () => {
-      if (copyValue) {
-        copy(copyValue);
-      }
-
-      setCopyNotificationOpen(true);
-    };
-  }
-
   return (
     <div className={classes.textFieldRoot}>
-      <CopyNotification open={copyNotificationOpen} onClose={handleCloseCopyNotification}/>
       <FormControl className={classes.formControl}>
         <InputLabel className={classes.label}>{label}</InputLabel>
         <InputBase
@@ -75,7 +64,17 @@ function DetailTextField(props) {
       {showCopy &&
       <Tooltip title={`Copy ${label}`}>
         <IconButton
-          onClick={wrapButtonClick({copyValue: value}) }
+          onClick={type === 'password'
+            ? wrapButtonClick({
+              message: 'Copied to clipboard',
+              loadPassword: true,
+              copyText: true,
+            })
+            : wrapButtonClick({
+              value: value,
+              copyText: true,
+              message: 'Copied to clipboard',
+            })}
         >
           <IconCopy/>
         </IconButton>
@@ -90,11 +89,14 @@ DetailTextField.propTypes = {
   type: PropTypes.string,
   showCopy: PropTypes.bool,
   multiline: PropTypes.bool,
+
+  wrapButtonClick: PropTypes.func,
 };
 
 DetailTextField.defaultProps = {
   multiline: false,
   showCopy: true,
+  value: '',
 };
 
 export default DetailTextField;

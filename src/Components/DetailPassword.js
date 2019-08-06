@@ -14,7 +14,7 @@ import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
-import {sendCredentials, sendText} from '../helpers';
+import {getPasswordById, sendCredentials, sendText} from '../helpers';
 import DetailTextField from './DetailTextField';
 import CopyNotification from './CopyNotification';
 
@@ -56,23 +56,44 @@ function DetailPassword(props) {
     setCopyNotificationOpen(false);
   }
 
-  function wrapButtonClick({value, message, callback}) {
+  /**
+   *
+   * @param value specify value to copy, and value to pass to callback
+   * @param message specify popup message
+   * @param copyText specify
+   * @param loadPassword should we try to load the password field?
+   * @param callback callback(value)
+   * @returns {Function}
+   */
+  function wrapButtonClick({value, message, copyText = false, loadPassword = false, callback}) {
     return () => {
-      if (value) {
-        copy(value)
-          .then(() => {
-            if (callback) {
-              // eslint-disable-next-line promise/no-callback-in-promise
-              callback(value);
-            }
-          })
-          .catch(err => {
-            // @TODO handle copy fails somehow
-          });
-      }
+      return Promise.resolve()
+        .then(() => {
+          if (loadPassword) {
+            const {token} = props;
+            return getPasswordById({token, passwordId: password.id, showPassword: true})
+              .then(result => result.attributes.password);
+          }
+          return value;
+        })
+        .then(result => {
+          if (copyText) {
+            return copy(result);
+          }
+          return result;
+        })
+        .then(result => {
+          if (callback) {
+            // eslint-disable-next-line promise/no-callback-in-promise
+            callback(result);
+          }
 
-      setCopyNotificationOpen(true);
-      setCopyMessage(message);
+          setCopyNotificationOpen(true);
+          setCopyMessage(message);
+        })
+        .catch(error => {
+          // @TODO catch these errors somehow
+        });
     };
   }
 
@@ -94,8 +115,9 @@ function DetailPassword(props) {
                 <IconButton
                   size="medium"
                   onClick={wrapButtonClick({
+                    loadPassword: true,
                     message: 'Credentials sent',
-                    callback: () => sendCredentials(password.attributes.username, password.attributes.password),
+                    callback: (value) => sendCredentials(password.attributes.username, value),
                   })}
                 >
                   <IconAssignmentReturn/>
@@ -117,8 +139,8 @@ function DetailPassword(props) {
                 <IconButton
                   size="medium"
                   onClick={wrapButtonClick({
-                    value: password.attributes.password,
                     message: 'Password sent',
+                    loadPassword: true,
                     callback: (value) => sendText(value),
                   })}
                 >
@@ -139,13 +161,14 @@ function DetailPassword(props) {
             <DetailTextField
               label="Username"
               value={password.attributes.username}
+              wrapButtonClick={wrapButtonClick}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <DetailTextField
               label="Password"
               type="password"
-              value={password.attributes.password}
+              wrapButtonClick={wrapButtonClick}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -165,6 +188,7 @@ function DetailPassword(props) {
 
 DetailPassword.propTypes = {
   password: PropTypes.object,
+  token: PropTypes.string,
 
   passwordLoaded: PropTypes.bool,
   passwordLoading: PropTypes.bool,
@@ -177,6 +201,7 @@ DetailPassword.defaultProps = {
 };
 
 export default connect(state => ({
+  token: state.auth.token,
   password: state.passwords.password,
   passwordLoaded: state.passwords.passwordLoaded,
   passwordLoading: state.passwords.passwordLoading,
