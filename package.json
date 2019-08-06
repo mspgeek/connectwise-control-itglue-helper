@@ -1,6 +1,6 @@
 {
   "name": "connectwise-control-itglue-helper",
-  "version": "1.0.0-alpha2",
+  "version": "1.0.0-alpha3",
   "description": "",
   "scripts": {
     "start": "webpack-dev-server --open --hot --mode development --config webpack-dev.config.js",
