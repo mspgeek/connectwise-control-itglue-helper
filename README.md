@@ -11,6 +11,11 @@
 - Currently **unable** to support SSO.  
 - May or may not work without 2FA/MFA enabled (if you don't have it enabled, you should turn it on.)
 
+#### Install Build Prerequisites
+```
+> npm install
+```
+
 #### Build
 ```
 > npm run build
