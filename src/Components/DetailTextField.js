@@ -75,7 +75,7 @@ function DetailTextField(props) {
       {showCopy &&
       <Tooltip title={`Copy ${label}`}>
         <IconButton
-          onClick={wrapButtonClick({copyValue: value})}
+          onClick={wrapButtonClick({copyValue: value}) }
         >
           <IconCopy/>
         </IconButton>

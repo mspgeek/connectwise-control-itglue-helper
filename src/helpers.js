@@ -171,14 +171,14 @@ export function getOrganizations(token) {
     })));
 }
 
-export function getOrganizationPasswords(token, id) {
+export function getOrganizationPasswords(token, orgId) {
   const itg = new ITGlue({
     mode: 'bearer',
     token,
   });
 
   return itg.get({
-    path: `/organizations/${id}/relationships/passwords`,
+    path: `/organizations/${orgId}/relationships/passwords`,
     params: {
       'page[size]': 1000,
       'page[number]': 1,
@@ -192,48 +192,27 @@ export function getOrganizationPasswords(token, id) {
       class: 'password',
       class_name: 'Password',
       orgId: password.attributes['organization-id'],
-      organization_name: password.attributes['organization-nam'],
+      organization_name: password.attributes['organization-name'],
       name: password.attributes.name,
       username: password.attributes.username,
       category: password.attributes['password-category-name'],
     })));
 }
 
-export function getPassword(token, orgId, passwordId) {
+export function getPasswordById({token, passwordId, showPassword = false}) {
   const itg = new ITGlue({
     mode: 'bearer',
     token,
   });
 
-  return itg.get({path: `/organizations/${orgId}/relationships/passwords/${passwordId}`})
-    .then(result => result.data);
-}
-
-export function getPasswordById({token, passwordId}) {
-  const itg = new ITGlue({
-    mode: 'bearer',
-    token,
-  });
-
-  return itg.get({path: '/passwords', params: {'filter[id]': passwordId}})
-    .then(results => results.data[0])
+  return itg.get({path: `/passwords/${passwordId}`, params: {'show_password': showPassword}})
     .then(result => {
-      return getPassword(token, result.attributes['organization-id'], result.id)
-        .then(password => {
-          console.log('returned from get Password', password);
-          return {
-            ...result,
-            attributes: {
-              ...password.attributes,
-              ...result.attributes,
-            },
-          };
-        });
+      return result.data;
     });
 }
 
-export function getAndSendPassword(token, orgId, passwordId) {
-  return getPassword(token, orgId, passwordId)
+export function getAndSendPassword(token, passwordId) {
+  return getPasswordById(token, passwordId, true)
     .then(result => {
       console.log('result is', result);
       const {username, password} = result.attributes;

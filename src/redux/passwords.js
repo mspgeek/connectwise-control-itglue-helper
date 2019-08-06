@@ -1,4 +1,4 @@
-import {getPassword, getPasswordById} from '../helpers';
+import {getPasswordById} from '../helpers';
 
 const GET_PASSWORD = 'passwords/GET_PASSWORD';
 const GET_PASSWORD_SUCCESS = 'passwords/GET_PASSWORD_SUCCESS';
@@ -62,23 +62,12 @@ export default function reducer(state = initialState, action = {}) {
   }
 }
 
-export function loadPassword(orgId, passwordId) {
+export function loadPasswordById(passwordId) {
   return (dispatch, getState) => {
     const {auth: {token}} = getState();
     dispatch({
       types: [GET_PASSWORD, GET_PASSWORD_SUCCESS, GET_PASSWORD_FAIL],
-      promise: getPassword(token, orgId, passwordId),
-    });
-  };
-}
-
-export function loadPasswordById(password) {
-  return (dispatch, getState) => {
-    const {auth: {token}} = getState();
-
-    dispatch({
-      types: [GET_PASSWORD, GET_PASSWORD_SUCCESS, GET_PASSWORD_FAIL],
-      promise: getPasswordById({token, passwordId: password.id}),
+      promise: getPasswordById({token, passwordId, showPassword: true}),
     });
   };
 }
