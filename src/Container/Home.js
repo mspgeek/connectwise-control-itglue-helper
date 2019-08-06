@@ -30,11 +30,23 @@ const theme = createMuiTheme({
 });
 
 const useStyles = makeStyles((currentTheme) => ({
+  '@global': {
+    body: {
+      backgroundColor: theme.palette.common.white,
+    },
+  },
   containerRoot: {
     padding: currentTheme.spacing(0, 1),
+    [theme.breakpoints.only('xs')]: {
+      'overflowY': 'scroll',
+      height: 500,
+    },
+    [theme.breakpoints.only('sm')]: {
+      'overflowY': 'scroll',
+      height: 300,
+    },
   },
 }));
-
 
 function Home(props) {
   const {
