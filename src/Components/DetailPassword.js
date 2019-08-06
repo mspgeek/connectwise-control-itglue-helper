@@ -117,12 +117,7 @@ function DetailPassword(props) {
                 <IconButton
                   size="medium"
                   onClick={wrapButtonClick({
-                    value: getPasswordById(token, password.id, true)
-                    // Retrieve Password value
-                    .then(result => {
-                      result = result.attributes.password;
-                      return result;
-                    }),
+                    value: password.attributes.password,
                     message: 'Password sent',
                     callback: (value) => sendText(value),
                   })}

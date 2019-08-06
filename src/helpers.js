@@ -207,7 +207,6 @@ export function getPasswordById({token, passwordId, showPassword = false}) {
 
   return itg.get({path: `/passwords/${passwordId}`, params: {'show_password': showPassword}})
     .then(result => {
-      result = result.data;
       return result.data;
     });
 }
