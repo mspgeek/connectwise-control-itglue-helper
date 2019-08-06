@@ -56,7 +56,7 @@ function ResultItem(props) {
   const {classes, item, handleClick} = props;
   return (
     <MenuItem className={classes.resultItem} dense disableGutters onClick={() => handleClick(item)}>
-      <Typography className={classes.resultItemLabel} noWrap>{item.name}</Typography>
+      <Typography className={classes.resultItemLabel} noWrap>{item.class === 'organization' ? `${item.name}` : `${item.name} (${item.organization_name})` }</Typography>
       <ListItemIcon>
         {item.class === 'organization' ? <IconHome/> : <IconKey/>}
       </ListItemIcon>
