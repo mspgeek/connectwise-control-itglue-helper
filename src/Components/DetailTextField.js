@@ -75,7 +75,13 @@ function DetailTextField(props) {
       {showCopy &&
       <Tooltip title={`Copy ${label}`}>
         <IconButton
-          onClick={wrapButtonClick({copyValue: value})}
+          onClick={{type === 'password' ? wrapButtonClick({
+            copyValue: getPasswordById(token, password.id, true)
+            // Retrieve Password value
+            .then(result => {
+              result = result.attributes.password;
+              return result;
+            }) }) : wrapButtonClick({copyValue: value}) }}
         >
           <IconCopy/>
         </IconButton>

@@ -117,7 +117,12 @@ function DetailPassword(props) {
                 <IconButton
                   size="medium"
                   onClick={wrapButtonClick({
-                    value: password.attributes.password,
+                    value: getPasswordById(token, password.id, true)
+                    // Retrieve Password value
+                    .then(result => {
+                      result = result.attributes.password;
+                      return result;
+                    }),
                     message: 'Password sent',
                     callback: (value) => sendText(value),
                   })}
@@ -145,7 +150,7 @@ function DetailPassword(props) {
             <DetailTextField
               label="Password"
               type="password"
-              value={password.attributes.password}
+              value=""
             />
           </Grid>
           <Grid item xs={12} sm={6}>
