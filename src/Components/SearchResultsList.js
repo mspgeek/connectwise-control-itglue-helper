@@ -31,14 +31,6 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
   },
   resultList: {
-    [theme.breakpoints.only('xs')]: {
-      'overflowY': 'scroll',
-      height: 500,
-    },
-    [theme.breakpoints.only('sm')]: {
-      'overflowY': 'scroll',
-      height: 300,
-    },
     padding: theme.spacing(0, 1),
   },
   progressRoot: {
@@ -57,8 +49,8 @@ function ResultItem(props) {
   return (
     <MenuItem className={classes.resultItem} dense disableGutters onClick={() => handleClick(item)}>
       <Typography className={classes.resultItemLabel} noWrap>{
-        item.class === 'organization' ? 
-          `${item.name}` : `${item.name} (${item.organization_name})` 
+        item.class === 'organization' ?
+          `${item.name}` : `${item.name} (${item.organization_name})`
       }</Typography>
       <ListItemIcon>
         {item.class === 'organization' ? <IconHome/> : <IconKey/>}
@@ -99,34 +91,36 @@ function SearchResultsList(props) {
   }
 
   return (
-    <Paper square>
+    <>
       {searchLoading &&
       <div className={classes.progressRoot}>
         <LinearProgress className={classes.progress}/>
       </div>
       }
-      {!searchLoading && searchLoaded &&
-      <MenuList
-        className={classes.resultList}
-      >
-        {searchLoaded && searchResults.length > 0 && searchResults.map((item, idx) => {
-          const label = `${item.label}-${idx}`;
-          return (
-            <ResultItem
-              item={item}
-              key={label}
-              classes={classes}
-              handleClick={handleClick}
-            />
-          );
-        })}
-        {searchLoaded && searchResults.length === 0 &&
-        <MenuItem className={classes.loading} disabled>
-          <Typography>No results</Typography>
-        </MenuItem>}
-      </MenuList>
-      }
-    </Paper>
+      <Paper square>
+        {!searchLoading && searchLoaded &&
+        <MenuList
+          className={classes.resultList}
+        >
+          {searchLoaded && searchResults.length > 0 && searchResults.map((item, idx) => {
+            const label = `${item.label}-${idx}`;
+            return (
+              <ResultItem
+                item={item}
+                key={label}
+                classes={classes}
+                handleClick={handleClick}
+              />
+            );
+          })}
+          {searchLoaded && searchResults.length === 0 &&
+          <MenuItem className={classes.loading} disabled>
+            <Typography>No results</Typography>
+          </MenuItem>}
+        </MenuList>
+        }
+      </Paper>
+    </>
   );
 }
 

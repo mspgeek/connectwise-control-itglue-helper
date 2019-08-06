@@ -3,7 +3,6 @@ import React from 'react';
 import {connect} from 'react-redux';
 import copy from 'clipboard-copy';
 import {makeStyles} from '@material-ui/styles';
-import IconCopy from '@material-ui/icons/FileCopy';
 import IconAccountBox from '@material-ui/icons/AccountBox';
 import IconAssignmentReturn from '@material-ui/icons/AssignmentReturn';
 import IconKey from '@material-ui/icons/VpnKey';
@@ -17,6 +16,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import {getPasswordById, sendCredentials, sendText} from '../helpers';
 import DetailTextField from './DetailTextField';
 import CopyNotification from './CopyNotification';
+import Paper from '@material-ui/core/Paper';
 
 /**
  * Created by kgrube on 8/2/2019
@@ -98,7 +98,7 @@ function DetailPassword(props) {
   }
 
   return (
-    <div className={classes.root}>
+    <Paper square className={classes.root}>
       <CopyNotification message={copyMessage} open={copyNotificationOpen} onClose={handleCloseCopyNotification}/>
       {passwordLoading && !passwordLoaded &&
       <div className={classes.progressRoot}>
@@ -182,7 +182,7 @@ function DetailPassword(props) {
         </Grid>
       </>
       }
-    </div>
+    </Paper>
   );
 }
 

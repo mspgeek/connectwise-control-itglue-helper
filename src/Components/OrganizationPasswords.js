@@ -7,7 +7,6 @@ import IconSearch from '@material-ui/icons/Search';
 import InputBase from '@material-ui/core/InputBase';
 import {filterPasswords, loadOrganizationPasswords, setPasswordSearchText} from '../redux/organizations';
 import SearchResultsList from './SearchResultsList';
-import filter from 'lodash/filter';
 
 const useStyles = makeStyles(theme => ({
   paperRoot: {
@@ -44,18 +43,11 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-
 function OrganizationPasswords(props) {
   const classes = useStyles();
   const {passwordSearchText, filteredPasswords, organizationPasswords} = props;
   const [searchText, setSearchText] = React.useState(passwordSearchText);
   const [searchTimeout, setSearchTimeout] = React.useState([]);
-
-  //
-  // React.useEffect(() => {
-  //   console.log('this fired.');
-  //   props.filterPasswords(passwordSearchText);
-  // }, [passwordSearchText]);
 
   React.useEffect(() => {
     console.log('use effect fired');
@@ -79,7 +71,7 @@ function OrganizationPasswords(props) {
   }
 
   return (
-    <div>
+    <>
       <Paper square className={classes.paperRoot}>
         <div className={classes.searchRoot}>
           <div className={classes.searchIcon}>
@@ -104,7 +96,7 @@ function OrganizationPasswords(props) {
         searchLoading={props.passwordsLoading}
         searchLoaded={props.passwordsLoaded}
       />
-    </div>
+    </>
   );
 }
 

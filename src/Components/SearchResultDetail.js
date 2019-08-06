@@ -5,24 +5,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import Paper from '@material-ui/core/Paper';
-import {makeStyles} from '@material-ui/styles';
 
 import DetailPassword from './DetailPassword';
 import OrganizationPasswords from './OrganizationPasswords';
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    width: '100%',
-  },
-}));
-
 // show password detail, or list of client passwords
 function SearchResultDetail(props) {
   const {selectedItem, selectedType} = props;
-  const classes = useStyles();
   return (
-    <Paper square className={classes.root}>
+    <>
       {selectedType === 'password' &&
       <DetailPassword
         password={selectedItem}
@@ -31,7 +22,7 @@ function SearchResultDetail(props) {
       {selectedType === 'organization' &&
       <OrganizationPasswords/>
       }
-    </Paper>
+    </>
   );
 }
 

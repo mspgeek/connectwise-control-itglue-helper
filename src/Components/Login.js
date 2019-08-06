@@ -2,31 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import Avatar from '@material-ui/core/Avatar';
 import {makeStyles} from '@material-ui/styles';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Grid from '@material-ui/core/Grid';
-import Hidden from '@material-ui/core/Hidden';
 
 import {setAuth, login} from '../redux/auth';
 import {connect} from 'react-redux';
 
 const useStyles = makeStyles(theme => ({
-  '@global': {
-    body: {
-      backgroundColor: theme.palette.common.white,
-    },
-  },
   paper: {
     marginTop: theme.spacing(1),
     padding: theme.spacing(0, 2),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
   },
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -49,11 +37,6 @@ function Login(props) {
   const classes = useStyles();
   return (
     <div className={classes.paper}>
-      <Hidden only={['sm']}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon/>
-        </Avatar>
-      </Hidden>
       <form className={classes.form} noValidate onSubmit={handleSubmit}>
         <Grid container spacing={1}>
           <Grid item xs={12} sm={6} md={12}>
