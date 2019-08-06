@@ -82,7 +82,7 @@ function SearchResultsList(props) {
       props.loadOrganizationPasswords(item);
     } else if (item.class === 'password') {
       props.selectPasswordId(item.id);
-      props.loadPasswordById(item);
+      props.loadPasswordById(item.id);
     } else {
       // this shouldn't happen
       props.showAlert('Invalid result selected.');
