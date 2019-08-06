@@ -145,7 +145,7 @@ function DetailPassword(props) {
             <DetailTextField
               label="Password"
               type="password"
-              value=""
+              value={password.attributes.password}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
