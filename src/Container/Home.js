@@ -15,6 +15,7 @@ import {checkToken} from '../redux/auth';
 import AppBarHeader from '../Components/AppBarHeader';
 import SearchResultsList from '../Components/SearchResultsList';
 import SearchResultDetail from '../Components/SearchResultDetail';
+import SearchSelect from '../Components/SearchSelect';
 
 const theme = createMuiTheme({
   breakpoints: {
@@ -78,6 +79,7 @@ function Home(props) {
         <Alert/>
         {!loggedIn &&
         <Login/>}
+        {loggedIn && <SearchSelect className={classes.searchSelect}/>}
         {loggedIn &&
         <SearchResultsList
           searchResultOpen={searchResultOpen}

@@ -21,7 +21,6 @@ export function setSCSettingValue(key, value) {
   }
 }
 
-
 /**
  * @param {string} key
  */
@@ -38,7 +37,6 @@ export function getSCSettingValue(key) {
   }
   return value;
 }
-
 
 /**
  * @param {string} key
@@ -115,26 +113,6 @@ export function clearStore() {
   setSCSettingValue(SETTING_REDUX, '');
 }
 
-
-/**
- * @param subdomain
- * @param email
- * @param password
- * @param otp
- * @returns {Promise<{string}>} token
- */
-export function itgLogin(subdomain, email, password, otp) {
-  const itg = new ITGlue({
-    mode: 'user',
-    user: {
-      email, password, otp,
-    },
-    companyUrl: `https://${subdomain}.itglue.com`,
-  });
-
-  return itg.getItGlueJsonWebToken({email, password, otp});
-}
-
 /**
  * @param token
  * @returns {Promise<boolean>}
@@ -150,28 +128,7 @@ export function verifyToken(token) {
     .catch(() => false);
 }
 
-export function getOrganizations(token) {
-  const itg = new ITGlue({
-    mode: 'bearer',
-    token,
-  });
-
-  return itg.get({
-    path: '/organizations',
-    params: {
-      'page[size]': 1000,
-      'filter[psa_integration_type]': 'manage',
-    },
-  })
-  // make the data returned usable
-    .then(results => results.data.map(org => ({
-      orgId: org.id,
-      name: org.attributes.name,
-      shortName: org.attributes['short-name'],
-    })));
-}
-
-export function getOrganizationPasswords(token, orgId) {
+export function getOrganizationPasswords({token, orgId}) {
   const itg = new ITGlue({
     mode: 'bearer',
     token,
@@ -211,39 +168,7 @@ export function getPasswordById({token, passwordId, showPassword = false}) {
     });
 }
 
-export function getAndSendPassword(token, passwordId) {
-  return getPasswordById(token, passwordId, true)
-    .then(result => {
-      console.log('result is', result);
-      const {username, password} = result.attributes;
-      sendCredentials(username, password);
-      return result;
-    });
-}
-
-export function searchOrganization(subdomain, token, searchText) {
-  const config = {
-    companyUrl: `https://${subdomain}.itglue.com`,
-    token,
-    mode: 'user-bearer',
-  };
-
-  if (__CORS_ANYWHERE__) {
-    config.companyUrl = `${CORS_ANYWHERE}${config.companyUrl}`;
-  }
-  const itg = new ITGlue(config);
-
-  return itg.search({query: searchText, limit: 25})
-    .then(result => filter(result, el => el.class === 'organization'))
-    .then(result => result.map(org => ({
-      orgId: org.id,
-      name: org.name,
-      shortName: org.short_name,
-    })))
-    .then(result => result.map(org => ({value: org.orgId, label: org.shortName})));
-}
-
-export function getItGlueJsonWebToken(subdomain, otp, email, password) {
+export function getItGlueJsonWebToken({subdomain, otp, email, password}) {
   const config = {
     mode: 'user',
     companyUrl: `https://${subdomain}.itglue.com`,
@@ -263,7 +188,7 @@ export function getItGlueJsonWebToken(subdomain, otp, email, password) {
   return itg.getItGlueJsonWebToken({email, password, otp});
 }
 
-export function getSearch(subdomain, token, searchText) {
+export function getSearch({subdomain, token, searchText, kind = 'organizations,passwords', orgId}) {
   const config = {
     companyUrl: `https://${subdomain}.itglue.com`,
     token,
@@ -275,12 +200,10 @@ export function getSearch(subdomain, token, searchText) {
   }
   const itg = new ITGlue(config);
 
-  return itg.search({query: searchText, limit: 10, kind: 'passwords,organizations'});
-  // .then(result => filter(result, el => el.class === 'organization'))
-  // .then(result => result.map(org => ({
-  //   orgId: org.id,
-  //   name: org.name,
-  //   shortName: org.short_name,
-  // })))
-  // .then(result => result.map(org => ({value: org.orgId, label: org.shortName})));
+  return itg.search({
+    query: searchText,
+    limit: 50,
+    kind,
+    filter_organization_id: orgId,
+  });
 }

@@ -8,10 +8,16 @@ const LOAD_SEARCH_SUCCESS = 'search/LOAD_SEARCH_SUCCESS';
 const LOAD_SEARCH_FAIL = 'search/LOAD_SEARCH_FAIL';
 
 const SET_SEARCH_TEXT = 'search/SET_SEARCH_TEXT';
-const SELECT_ITEM = 'search/SELECT_ITEM';
-const DESELECT_ITEM = 'search/DESELECT_ITEM';
+const SET_SEARCH_CONTEXT = 'search/SET_SEARCH_CONTEXT';
 const SHOW_SEARCH_RESULT = 'search/SHOW_SEARCH_RESULT';
 const HIDE_SEARCH_RESULT = 'search/HIDE_SEARCH_RESULT';
+const SET_ACTIVE_COMPONENT = 'search/SET_ACTIVE_COMPONENT';
+
+const SELECT_PASSWORD = 'search/SELECT_PASSWORD';
+const DESELECT_PASSWORD = 'search/DESELECT_PASSWORD';
+const SELECT_ORGANIZATION = 'search/SELECT_ORGANIZATION';
+const DESELECT_ORGANIZATION = 'search/DESELECT_ORGANIZATION';
+
 const RESET = 'search/RESET';
 
 const initialState = {
@@ -24,10 +30,13 @@ const initialState = {
   searchResultOpen: false,
   // the context in which to search
   // 'global' => use /search.json
-  // 'organization' => filter passwords
+  // 'organization' => include filter_organization_id
   searchContext: 'global', // ['global', 'organization']
-  selectedItem: undefined,
+  selectedOrganization: undefined,
+  selectedPassword: undefined,
   selectedType: undefined, // ['password','organization']
+
+  activeComponent: 'header',
 };
 
 export default function reducer(state = initialState, action = {}) {
@@ -58,17 +67,29 @@ export default function reducer(state = initialState, action = {}) {
         ...state,
         searchText: action.searchText,
       };
-    case SELECT_ITEM:
+    case SELECT_PASSWORD:
       return {
         ...state,
-        selectedItem: action.item,
-        selectedType: action.item.class,
+        selectedType: 'password',
+        selectedPassword: action.password,
       };
-    case DESELECT_ITEM:
+    case DESELECT_PASSWORD:
       return {
         ...state,
-        selectedItem: undefined,
         selectedType: undefined,
+        selectedPassword: undefined,
+      };
+    case SELECT_ORGANIZATION:
+      return {
+        ...state,
+        selectedType: 'organization',
+        selectedOrganization: action.password,
+      };
+    case DESELECT_ORGANIZATION:
+      return {
+        ...state,
+        selectedType: undefined,
+        selectedOrganization: undefined,
       };
     case HIDE_SEARCH_RESULT:
       return {
@@ -80,6 +101,16 @@ export default function reducer(state = initialState, action = {}) {
         ...state,
         searchResultOpen: true,
       };
+    case SET_SEARCH_CONTEXT:
+      return {
+        ...state,
+        searchContext: action.searchContext,
+      };
+    case SET_ACTIVE_COMPONENT:
+      return {
+        ...state,
+        activeComponent: action.activeComponent,
+      };
     case RESET:
       return initialState;
     default:
@@ -87,13 +118,25 @@ export default function reducer(state = initialState, action = {}) {
   }
 }
 
-export function loadSearch(searchText) {
+export function loadSearch({searchText}) {
   return (dispatch, getState) => {
-    const {auth: {user: {subdomain}, token}} = getState();
+    const {
+      auth: {user: {subdomain}, token},
+      search: {searchContext, selectedOrganization},
+    } = getState();
+
+    const searchOptions = {subdomain, token, searchText};
+
+    if (searchContext === 'organization') {
+      searchOptions.orgId = selectedOrganization.id;
+      searchOptions.kind = 'passwords';
+    } else {
+      searchOptions.kind = 'organizations,passwords';
+    }
 
     return dispatch({
       types: [LOAD_SEARCH, LOAD_SEARCH_SUCCESS, LOAD_SEARCH_FAIL],
-      promise: getSearch(subdomain, token, searchText),
+      promise: getSearch(searchOptions),
     });
   };
 }
@@ -117,16 +160,29 @@ export function hideSearchResult() {
   };
 }
 
-export function selectItem(item) {
+export function selectPassword(password) {
   return {
-    type: SELECT_ITEM,
-    item,
+    type: SELECT_PASSWORD,
+    password,
   };
 }
 
-export function deselectItem() {
+export function deselectPassword() {
   return {
-    type: DESELECT_ITEM,
+    type: DESELECT_PASSWORD,
+  };
+}
+
+export function selectOrganization(organization) {
+  return {
+    type: SELECT_ORGANIZATION,
+    organization,
+  };
+}
+
+export function deselectOrganization() {
+  return {
+    type: DESELECT_ORGANIZATION,
   };
 }
 
@@ -139,6 +195,13 @@ export function toggleSearchContext() {
         searchContext: 'global',
       });
     }
+  };
+}
+
+export function setActiveComponent(activeComponent) {
+  return {
+    type: SET_ACTIVE_COMPONENT,
+    activeComponent,
   };
 }
 

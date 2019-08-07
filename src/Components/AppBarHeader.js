@@ -6,12 +6,13 @@ import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import IconChevronLeft from '@material-ui/icons/ChevronLeft';
 import IconChevronRight from '@material-ui/icons/ChevronRight';
+import IconMenu from '@material-ui/icons/Menu';
 import Button from '@material-ui/core/Button';
 import {makeStyles} from '@material-ui/styles';
 
 import {logout, resetAll} from '../redux/auth';
-import SearchSelect from './SearchSelect';
-
+import {setActiveComponent} from '../redux/search';
+import {Typography} from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -27,43 +28,53 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'row',
     flexGrow: 1,
   },
-  searchSelect: {
-    flexGrow: 1,
-    padding: theme.spacing(0, 2),
-    boxShadow: 'none',
-  },
 }));
-
 
 function AppBarHeader(props) {
   const classes = useStyles();
-  const {loggedIn} = props;
+  const {loggedIn, activeComponent, selectedOrganization} = props;
 
-  const [activeComponent, setActiveComponent] = React.useState(1);
+  React.useEffect(() => {
+
+  }, [loggedIn]);
 
   /**
    *
-   * @param direction left is false, right is true
+   * @param componentName left is false, right is true
    */
-  function handleChangeComponent(direction) {
-    setActiveComponent(direction ? activeComponent + 1 : activeComponent - 1);
+  function handleChangeComponent(componentName) {
+    props.setActiveComponent(componentName);
   }
 
-  const components = [
-    <div key={0}>
+  const components = {
+    utils: <div key={0}>
       <IconButton
         edge="start"
         className={classes.menuButton}
         color="inherit"
         aria-label="menu"
-        onClick={() => handleChangeComponent(true)}
+        onClick={() => handleChangeComponent('header')}
       >
         <IconChevronRight/>
       </IconButton>
       {loggedIn && <Button color="inherit" onClick={() => props.logout()}>Logout</Button>}
       <Button color="secondary" onClick={() => props.resetAll()}>Reset State</Button>
     </div>,
-    <div key={1} className={classes.componentRoot}>
+    header: <div key={1} className={classes.componentRoot}>
+      <IconButton
+        edge="start"
+        className={classes.menuButton}
+        color="inherit"
+        aria-label="menu"
+        onClick={() => handleChangeComponent('utils')}
+      >
+        <IconChevronLeft/>
+      </IconButton>
+      <Typography variant="h6">
+        ITGlue Helper
+      </Typography>
+    </div>,
+    detail: <div key={2} className={classes.componentRoot}>
       <IconButton
         edge="start"
         className={classes.menuButton}
@@ -73,9 +84,12 @@ function AppBarHeader(props) {
       >
         <IconChevronLeft/>
       </IconButton>
-      {loggedIn && <SearchSelect className={classes.searchSelect}/>}
+      <Typography variant="h6">
+        {selectedOrganization && selectedOrganization.attributes && selectedOrganization.attributes.name ||
+        'not selected'}
+      </Typography>
     </div>,
-  ];
+  };
 
   return (
     <div className={classes.root}>
@@ -92,10 +106,26 @@ AppBarHeader.propTypes = {
   //actions
   logout: PropTypes.func,
   resetAll: PropTypes.func,
+  setActiveComponent: PropTypes.func,
 
   loginPending: PropTypes.bool,
   loggedIn: PropTypes.bool,
+  searchContext: PropTypes.string,
+  selectedOrganization: PropTypes.object,
+  activeComponent: PropTypes.string,
 };
-AppBarHeader.defaultProps = {};
 
-export default connect(state => ({...state.auth}), {logout, resetAll})(AppBarHeader);
+AppBarHeader.defaultProps = {
+  searchContext: 'global',
+  activeComponent: 'header',
+};
+
+export default connect(
+  state => ({
+    ...state.auth,
+    searchContext: state.search.searchContext,
+    selectedType: state.search.selectedType,
+    selectedOrganization: state.search.selectedOrganization,
+    activeComponent: state.search.activeComponent,
+  }),
+  {logout, resetAll, setActiveComponent})(AppBarHeader);

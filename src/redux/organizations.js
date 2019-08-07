@@ -77,7 +77,6 @@ export function selectOrganization(organization) {
   };
 }
 
-
 export function loadOrganizationPasswords() {
   return (dispatch, getState) => {
     const state = getState();
@@ -85,7 +84,7 @@ export function loadOrganizationPasswords() {
 
     return dispatch({
       types: [GET_ORG_PASSWORDS, GET_ORG_PASSWORDS_SUCCESS, GET_ORG_PASSWORDS_FAIL],
-      promise: getOrganizationPasswords(token, id),
+      promise: getOrganizationPasswords({token, id}),
     });
   };
 }

@@ -2,7 +2,7 @@ import {saveToken, verifyToken, getItGlueJsonWebToken, clearStore, getSavedToken
 import {reset as resetAlert, dismissAlert} from './alert';
 import {reset as resetOrgs} from './organizations';
 import {reset as resetPasswords} from './passwords';
-import {reset as resetSearch} from './search';
+import {reset as resetSearch, setActiveComponent} from './search';
 
 const LOGOUT = 'auth/LOGOUT';
 
@@ -18,7 +18,6 @@ const LOGIN_TOKEN_SUCCESS = 'auth/LOGIN_TOKEN_SUCCESS';
 const LOGIN_TOKEN_FAIL = 'auth/LOGIN_TOKEN_FAIL';
 
 const RESET = 'auth/RESET';
-
 
 const initialState = {
   user: {
@@ -120,9 +119,10 @@ export function login() {
 
     return dispatch({
       types: [LOGIN, LOGIN_SUCCESS, LOGIN_FAIL],
-      promise: getItGlueJsonWebToken(subdomain, otp, email, password)
+      promise: getItGlueJsonWebToken({subdomain, otp, email, password})
         .then((token) => {
           dispatch(dismissAlert());
+          dispatch(setActiveComponent('header'));
           return token;
         }),
     });
