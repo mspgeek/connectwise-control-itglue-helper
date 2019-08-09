@@ -8,7 +8,7 @@ const SELECT_PASSWORD = 'passwords/SELECT_PASSWORD';
 
 const RESET = 'passwords/RESET';
 
-const initialState = {
+export const initialState = {
   passwords: [],
   passwordsLoading: false,
   passwordsLoaded: false,

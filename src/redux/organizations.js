@@ -10,7 +10,7 @@ const FILTER_PASSWORDS = 'organization/FILTER_PASSWORDS';
 const SELECT_ORGANIZATION = 'organizations/SELECT_ORGANIZATION';
 const RESET = 'organizations/RESET';
 
-const initialState = {
+export const initialState = {
   selectedOrganization: undefined,
   passwordSearchText: '',
 

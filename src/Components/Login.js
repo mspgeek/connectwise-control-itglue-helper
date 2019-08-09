@@ -4,6 +4,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import {makeStyles} from '@material-ui/styles';
 import Grid from '@material-ui/core/Grid';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 import {setAuth, login} from '../redux/auth';
 import {connect} from 'react-redux';
@@ -23,6 +24,15 @@ const useStyles = makeStyles(theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  progressRoot: {
+    display: 'flex',
+    justifyContent: 'center',
+    height: theme.spacing(8),
+    alignItems: 'center',
+  },
+  progress: {
+    flexGrow: 1,
+  },
 }));
 
 function Login(props) {
@@ -36,82 +46,88 @@ function Login(props) {
 
   const classes = useStyles();
   return (
-    <div className={classes.paper}>
-      <form className={classes.form} noValidate onSubmit={handleSubmit}>
-        <Grid container spacing={1}>
-          <Grid item xs={12} sm={6} md={12}>
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="subdomain"
-              label="Subdomain"
-              name="subdomain"
-              autoComplete="subdomain"
-              autoFocus
-              onChange={handleChange('subdomain')}
-              value={subdomain}
-            />
+    <>
+      {loginPending &&
+      <div className={classes.progressRoot}>
+        <LinearProgress className={classes.progress}/>
+      </div>}
+      <div className={classes.paper}>
+        <form className={classes.form} noValidate onSubmit={handleSubmit}>
+          <Grid container spacing={1}>
+            <Grid item xs={12} sm={6} md={12}>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="subdomain"
+                label="Subdomain"
+                name="subdomain"
+                autoComplete="subdomain"
+                autoFocus
+                onChange={handleChange('subdomain')}
+                value={subdomain}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={12}>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                onChange={handleChange('email')}
+                value={email}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={12}>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                onChange={handleChange('password')}
+                value={password}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={12}>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                name="otp"
+                label="MFA Code"
+                type="password"
+                id="otp"
+                onChange={handleChange('otp')}
+                value={otp}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                disabled={loginPending}
+              >
+                Sign In
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6} md={12}>
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              onChange={handleChange('email')}
-              value={email}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={12}>
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              onChange={handleChange('password')}
-              value={password}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={12}>
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              name="otp"
-              label="MFA Code"
-              type="password"
-              id="otp"
-              onChange={handleChange('otp')}
-              value={otp}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              disabled={loginPending}
-            >
-              Sign In
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
-    </div>
+        </form>
+      </div>
+    </>
   );
 }
 

@@ -19,7 +19,7 @@ const LOGIN_TOKEN_FAIL = 'auth/LOGIN_TOKEN_FAIL';
 
 const RESET = 'auth/RESET';
 
-const initialState = {
+export const initialState = {
   user: {
     subdomain: '',
     otp: '',
@@ -123,6 +123,7 @@ export function login() {
         .then((token) => {
           dispatch(dismissAlert());
           dispatch(setActiveComponent('header'));
+          saveToken(token);
           return token;
         }),
     });
@@ -138,7 +139,10 @@ export function checkToken() {
 
     return dispatch({
       types: [LOGIN_TOKEN, LOGIN_TOKEN_SUCCESS, LOGIN_TOKEN_FAIL],
-      promise: verifyToken(token),
+      promise: verifyToken(token)
+        .then(() => {
+          dispatch(dismissAlert());
+        }),
     });
   };
 }

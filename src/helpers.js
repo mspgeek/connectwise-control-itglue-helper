@@ -1,6 +1,5 @@
 /* global __DEV__ */
 /* global __CORS_ANYWHERE__ */
-import filter from 'lodash/filter';
 import ITGlue from 'node-itglue';
 
 import {SETTING_TOKEN, SETTING_REDUX, CORS_ANYWHERE} from './strings';
@@ -78,12 +77,19 @@ export function sendText(text) {
 }
 
 export function saveToken(token) {
-  setSCSettingValue(SETTING_TOKEN, token);
+  console.log('saveToken', token);
+  if (token) {
+    setSCSettingValue(SETTING_TOKEN, token);
+  } else {
+    setSCSettingValue(SETTING_TOKEN, '');
+  }
+
 }
 
 export function getSavedToken() {
-  console.log('getSavedToken');
-  return getSCSettingValue(SETTING_TOKEN);
+  const token = getSCSettingValue(SETTING_TOKEN);
+  console.log('getSavedToken', token);
+  return token;
 }
 
 export function deleteToken() {
@@ -98,7 +104,7 @@ export function saveStore(store) {
 
 export function saveTokenFromStore(store) {
   const {auth: {token}} = store;
-  setSCSettingValue(SETTING_TOKEN, token);
+  saveToken(token);
 }
 
 export function getStore() {
@@ -204,6 +210,7 @@ export function getSearch({subdomain, token, searchText, kind = 'organizations,p
     query: searchText,
     limit: 50,
     kind,
+    related: true,
     filter_organization_id: orgId,
   });
 }

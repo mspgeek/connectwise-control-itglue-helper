@@ -36,6 +36,12 @@ function Alert(props) {
       if (message.detail) {
         messageClean = `${messageClean} - ${message.detail}`;
       }
+    } else if (message.data) {
+      if (message.data.error_message) {
+        messageClean = message.data.error_message;
+      }
+    } else if (message.statusText) {
+      messageClean = message.statusText;
     } else {
       messageClean = JSON.stringify(message);
     }
@@ -60,7 +66,7 @@ Alert.propTypes = {
   // actions
   dismissAlert: PropTypes.func,
 
-  message: PropTypes.string,
+  message: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   show: PropTypes.bool,
 };
 

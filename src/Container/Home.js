@@ -64,12 +64,12 @@ function Home(props) {
   const classes = useStyles();
 
   useEffect(() => {
-    // if there's a saved token, check if it's valid
-    // @TODO need to check token is valid more often
-    if (!loggedIn && !loginPending && subdomain && token) {
-      props.checkToken();
-    }
-  });
+    // // if there's a saved token, check if it's valid
+    // // @TODO need to check token is valid more often
+    props.checkToken();
+
+    console.log('token changed', token);
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -79,14 +79,16 @@ function Home(props) {
         <Alert/>
         {!loggedIn &&
         <Login/>}
-        {loggedIn && <SearchSelect className={classes.searchSelect}/>}
         {loggedIn &&
-        <SearchResultsList
-          searchResultOpen={searchResultOpen}
-          searchResults={searchResults}
-          searchLoading={searchLoading}
-          searchLoaded={searchLoaded}
-        />}
+        <>
+          <SearchSelect/>
+          <SearchResultsList
+            searchResultOpen={searchResultOpen}
+            searchResults={searchResults}
+            searchLoading={searchLoading}
+            searchLoaded={searchLoaded}
+          />
+        </>}
         {loggedIn && selectedItem &&
         <SearchResultDetail/>}
       </Container>

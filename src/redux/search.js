@@ -20,7 +20,7 @@ const DESELECT_ORGANIZATION = 'search/DESELECT_ORGANIZATION';
 
 const RESET = 'search/RESET';
 
-const initialState = {
+export const initialState = {
   searchText: '',
   searchResults: [],
 
@@ -118,11 +118,11 @@ export default function reducer(state = initialState, action = {}) {
   }
 }
 
-export function loadSearch({searchText}) {
+export function loadSearch() {
   return (dispatch, getState) => {
     const {
       auth: {user: {subdomain}, token},
-      search: {searchContext, selectedOrganization},
+      search: {searchContext, selectedOrganization, searchText},
     } = getState();
 
     const searchOptions = {subdomain, token, searchText};
@@ -136,7 +136,11 @@ export function loadSearch({searchText}) {
 
     return dispatch({
       types: [LOAD_SEARCH, LOAD_SEARCH_SUCCESS, LOAD_SEARCH_FAIL],
-      promise: getSearch(searchOptions),
+      promise: getSearch(searchOptions)
+        .then(results => {
+          dispatch(showSearchResult());
+          return results;
+        }),
     });
   };
 }
@@ -188,6 +192,7 @@ export function deselectOrganization() {
 
 export function toggleSearchContext() {
   return (dispatch, getState) => {
+    // @TODO finish this
     const {selectedItem, searchContext} = getState().search;
     if (selectedItem) {
       return dispatch({
