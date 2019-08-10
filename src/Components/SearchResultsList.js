@@ -9,8 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import MenuList from '@material-ui/core/MenuList';
 import {connect} from 'react-redux';
 import {makeStyles} from '@material-ui/core';
-import {hideSearchResult, selectOrganization, selectPassword, setActiveComponent} from '../redux/search';
-import {loadOrganizationPasswords} from '../redux/organizations';
+import {hideSearchResult, selectOrganization, selectPassword, setActiveComponent, setSearchContext} from '../redux/search';
 import {loadPasswordById} from '../redux/passwords';
 import {showAlert} from '../redux/alert';
 import LinearProgress from '@material-ui/core/LinearProgress';
@@ -73,18 +72,16 @@ function SearchResultsList(props) {
     console.log('selected item', item);
     // call action
     if (item.class === 'organization') {
-      props.setActiveComponent('detail');
       props.selectOrganization(item);
-      props.loadOrganizationPasswords(item);
     } else if (item.class === 'password') {
-      props.setActiveComponent('detail');
+      props.setActiveComponent('password');
       props.selectPassword(item);
       props.loadPasswordById(item.id);
+      props.hideSearchResult();
     } else {
       // this shouldn't happen
       props.showAlert('Invalid result selected.');
     }
-    props.hideSearchResult();
   }
 
   if (!props.searchResultOpen) {
@@ -140,6 +137,7 @@ SearchResultsList.propTypes = {
   loadOrganizationPasswords: PropTypes.func,
   loadPasswordById: PropTypes.func,
   setActiveComponent: PropTypes.func,
+  setSearchContext: PropTypes.func,
 };
 
 SearchResultsList.defaultProps = {
@@ -155,7 +153,7 @@ export default connect(
     hideSearchResult,
     selectPassword,
     selectOrganization,
-    loadOrganizationPasswords,
     loadPasswordById,
     showAlert,
+    setSearchContext,
   })(SearchResultsList);

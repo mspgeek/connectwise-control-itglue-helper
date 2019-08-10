@@ -5,7 +5,6 @@ import {promiseThunkMiddleware, errorHandler, cacheHandler} from './middleware';
 import {getSavedToken, getStore} from '../helpers';
 import {initialState as alert} from './alert';
 import {initialState as auth} from './auth';
-import {initialState as organizations} from './organizations';
 import {initialState as passwords} from './passwords';
 import {initialState as search} from './search';
 
@@ -14,7 +13,7 @@ let initialState = getStore();
 
 if (!initialState) {
   initialState = {
-    alert, auth, organizations, passwords, search,
+    alert, auth, passwords, search,
   };
 }
 

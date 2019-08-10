@@ -62,8 +62,9 @@ function SearchSelect(props) {
         inputProps={{'aria-label': 'search'}}
         onChange={handleChange}
         value={props.searchText}
-        placeholder="Search"
-        // onFocus={handleFocus}
+        placeholder={props.searchContext === 'organization'
+          ? `Search ${props.selectedOrganization && props.selectedOrganization.name}`
+          : 'Global search'}
       />
     </Paper>
   );
@@ -83,6 +84,7 @@ SearchSelect.propTypes = {
   searchResults: PropTypes.array,
   searchText: PropTypes.string,
   searchContext: PropTypes.oneOf(['global', 'organization']),
+  selectedOrganization: PropTypes.object,
 };
 
 SearchSelect.defaultProps = {

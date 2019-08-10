@@ -26,6 +26,7 @@ const useStyles = makeStyles(theme => {
   return {
     root: {
       padding: theme.spacing(1),
+      paddingTop: theme.spacing(1),
     },
     gridItem: {
       display: 'flex',

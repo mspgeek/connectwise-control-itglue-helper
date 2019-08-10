@@ -5,6 +5,7 @@ const GET_PASSWORD_SUCCESS = 'passwords/GET_PASSWORD_SUCCESS';
 const GET_PASSWORD_FAIL = 'passwords/GET_PASSWORD_FAIL';
 
 const SELECT_PASSWORD = 'passwords/SELECT_PASSWORD';
+const DESELECT_PASSWORD = 'passwords/DESELECT_PASSWORD';
 
 const RESET = 'passwords/RESET';
 
@@ -24,13 +25,14 @@ export const initialState = {
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
-    case SELECT_PASSWORD: {
+    case SELECT_PASSWORD:
       return {
         // reset to initial state
         ...initialState,
         passwordId: action.passwordId,
       };
-    }
+    case DESELECT_PASSWORD:
+      return initialState;
     case GET_PASSWORD:
       return {
         ...state,
@@ -72,10 +74,9 @@ export function loadPasswordById(passwordId) {
   };
 }
 
-export function selectPasswordId(passwordId) {
+export function deselectPassword() {
   return {
-    type: SELECT_PASSWORD,
-    passwordId,
+    type: DESELECT_PASSWORD,
   };
 }
 

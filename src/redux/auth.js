@@ -1,6 +1,5 @@
 import {saveToken, verifyToken, getItGlueJsonWebToken, clearStore, getSavedToken} from '../helpers';
 import {reset as resetAlert, dismissAlert} from './alert';
-import {reset as resetOrgs} from './organizations';
 import {reset as resetPasswords} from './passwords';
 import {reset as resetSearch, setActiveComponent} from './search';
 
@@ -173,7 +172,6 @@ export function resetAll() {
   saveToken('');
   return (dispatch) => {
     dispatch(resetAlert());
-    dispatch(resetOrgs());
     dispatch(resetPasswords());
     dispatch(resetSearch());
     dispatch(reset());

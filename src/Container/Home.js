@@ -55,7 +55,7 @@ function Home(props) {
     token,
     loginPending,
     user: {subdomain},
-    selectedItem,
+    selectedPassword,
     searchResultOpen,
     searchLoaded,
     searchLoading,
@@ -69,7 +69,7 @@ function Home(props) {
     props.checkToken();
 
     console.log('token changed', token);
-  }, []);
+  }, [token]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -77,9 +77,9 @@ function Home(props) {
       <AppBarHeader/>
       <Container maxWidth="xl" className={classes.containerRoot}>
         <Alert/>
-        {!loggedIn &&
+        {!loggedIn && !loginPending &&
         <Login/>}
-        {loggedIn &&
+        {loggedIn && !selectedPassword &&
         <>
           <SearchSelect/>
           <SearchResultsList
@@ -89,7 +89,7 @@ function Home(props) {
             searchLoaded={searchLoaded}
           />
         </>}
-        {loggedIn && selectedItem &&
+        {loggedIn && selectedPassword &&
         <SearchResultDetail/>}
       </Container>
     </ThemeProvider>
@@ -111,7 +111,7 @@ Home.propTypes = {
   searchResults: PropTypes.array,
   user: PropTypes.object,
   token: PropTypes.string,
-  selectedItem: PropTypes.object,
+  selectedPassword: PropTypes.object,
 };
 
 Home.defaultProps = {
@@ -124,7 +124,7 @@ Home.defaultProps = {
 
 export default connect(state => ({
   ...state.auth,
-  selectedItem: state.search.selectedItem,
+  selectedPassword: state.search.selectedPassword,
   searchResultOpen: state.search.searchResultOpen,
   searchResults: state.search.searchResults,
   searchLoading: state.search.searchLoading,

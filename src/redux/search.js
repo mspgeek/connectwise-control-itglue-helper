@@ -2,6 +2,7 @@
  * Created by kgrube on 8/1/2019
  */
 import {getSearch} from '../helpers';
+import {deselectPassword as passwordDeselect} from './passwords';
 
 const LOAD_SEARCH = 'search/LOAD_SEARCH';
 const LOAD_SEARCH_SUCCESS = 'search/LOAD_SEARCH_SUCCESS';
@@ -12,6 +13,7 @@ const SET_SEARCH_CONTEXT = 'search/SET_SEARCH_CONTEXT';
 const SHOW_SEARCH_RESULT = 'search/SHOW_SEARCH_RESULT';
 const HIDE_SEARCH_RESULT = 'search/HIDE_SEARCH_RESULT';
 const SET_ACTIVE_COMPONENT = 'search/SET_ACTIVE_COMPONENT';
+const CLEAR_RESULTS = 'search/CLEAR_RESULTS';
 
 const SELECT_PASSWORD = 'search/SELECT_PASSWORD';
 const DESELECT_PASSWORD = 'search/DESELECT_PASSWORD';
@@ -70,6 +72,7 @@ export default function reducer(state = initialState, action = {}) {
     case SELECT_PASSWORD:
       return {
         ...state,
+        searchContext: 'organization',
         selectedType: 'password',
         selectedPassword: action.password,
       };
@@ -82,14 +85,20 @@ export default function reducer(state = initialState, action = {}) {
     case SELECT_ORGANIZATION:
       return {
         ...state,
+        searchContext: 'organization',
         selectedType: 'organization',
-        selectedOrganization: action.password,
+        selectedOrganization: action.organization,
       };
     case DESELECT_ORGANIZATION:
       return {
         ...state,
         selectedType: undefined,
         selectedOrganization: undefined,
+      };
+    case CLEAR_RESULTS:
+      return {
+        ...state,
+        searchResults: [],
       };
     case HIDE_SEARCH_RESULT:
       return {
@@ -123,12 +132,13 @@ export function loadSearch() {
     const {
       auth: {user: {subdomain}, token},
       search: {searchContext, selectedOrganization, searchText},
+      passwords: {password},
     } = getState();
 
     const searchOptions = {subdomain, token, searchText};
 
     if (searchContext === 'organization') {
-      searchOptions.orgId = selectedOrganization.id;
+      searchOptions.orgId = (selectedOrganization && selectedOrganization.id) || password.attributes['organization-id'];
       searchOptions.kind = 'passwords';
     } else {
       searchOptions.kind = 'organizations,passwords';
@@ -172,33 +182,82 @@ export function selectPassword(password) {
 }
 
 export function deselectPassword() {
-  return {
-    type: DESELECT_PASSWORD,
+  return (dispatch, getState) => {
+    return dispatch({
+      type: DESELECT_PASSWORD,
+    });
   };
 }
 
 export function selectOrganization(organization) {
-  return {
-    type: SELECT_ORGANIZATION,
-    organization,
+  return (dispatch, getState) => {
+    dispatch({
+      type: SELECT_ORGANIZATION,
+      organization,
+    });
+    dispatch(setActiveComponent('organization'));
+    dispatch(setSearchContext({searchContext: 'organization'}));
+    dispatch(setSearchText(''));
+    dispatch(clearSearchResults());
+
   };
 }
 
 export function deselectOrganization() {
+  return (dispatch) => {
+    dispatch(passwordDeselect());
+    dispatch({
+      type: DESELECT_ORGANIZATION,
+    });
+  };
+}
+
+export function clearSearchResults() {
   return {
-    type: DESELECT_ORGANIZATION,
+    type: CLEAR_RESULTS,
+  };
+}
+
+export function setSearchContext({searchContext}) {
+  return (dispatch) => {
+    dispatch({
+      type: SET_SEARCH_CONTEXT,
+      searchContext,
+    });
+    dispatch(loadSearch());
   };
 }
 
 export function toggleSearchContext() {
   return (dispatch, getState) => {
     // @TODO finish this
-    const {selectedItem, searchContext} = getState().search;
-    if (selectedItem) {
-      return dispatch({
-        type: SET_SEARCH_CONTEXT,
-        searchContext: 'global',
-      });
+    const {selectedType, searchContext} = getState().search;
+    if (selectedType) {
+      return dispatch(setSearchContext({searchContext: searchContext === 'global' ? 'organization' : 'global'}));
+    }
+    return dispatch(setSearchContext({searchContext: 'global'}));
+  };
+}
+
+export function handleNavigation() {
+  return (dispatch, getState) => {
+    const {search, activeComponent: currentComponent} = getState().search;
+
+    if (currentComponent === 'utils') {
+      dispatch(setActiveComponent('header'));
+    } else if (currentComponent === 'header') {
+      dispatch(setActiveComponent('utils'));
+    } else if (currentComponent === 'organization') {
+      // on back from org, show global results
+      dispatch(setActiveComponent('header'));
+      dispatch(setSearchContext({searchContext: 'global'}));
+      dispatch(deselectOrganization());
+    } else if (currentComponent === 'password') {
+      // on back from password, show org results
+      dispatch(setActiveComponent('organization'));
+      dispatch(setSearchContext({searchContext: 'organization'}));
+      dispatch(showSearchResult());
+      dispatch(deselectPassword());
     }
   };
 }
