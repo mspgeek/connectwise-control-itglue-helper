@@ -7,27 +7,23 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
 import DetailPassword from './DetailPassword';
-import OrganizationPasswords from './OrganizationPasswords';
 
 // show password detail, or list of client passwords
 function SearchResultDetail(props) {
-  const {selectedItem, selectedType} = props;
+  const {selectedPassword, selectedType} = props;
   return (
     <>
       {selectedType === 'password' &&
       <DetailPassword
-        password={selectedItem}
-      />
-      }
-      {selectedType === 'organization' &&
-      <OrganizationPasswords/>
-      }
+        password={selectedPassword}
+      />}
     </>
   );
 }
 
 SearchResultDetail.propTypes = {
   // state variables
+  selectedPassword: PropTypes.object,
   selectedItem: PropTypes.object,
   selectedType: PropTypes.string,
 };

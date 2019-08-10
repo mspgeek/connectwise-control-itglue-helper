@@ -9,9 +9,8 @@ import Paper from '@material-ui/core/Paper';
 import MenuList from '@material-ui/core/MenuList';
 import {connect} from 'react-redux';
 import {makeStyles} from '@material-ui/core';
-import {hideSearchResult, selectItem, showSearchResult} from '../redux/search';
-import {selectOrganization, loadOrganizationPasswords} from '../redux/organizations';
-import {loadPasswordById, selectPasswordId} from '../redux/passwords';
+import {hideSearchResult, selectOrganization, selectPassword, setActiveComponent, setSearchContext} from '../redux/search';
+import {loadPasswordById} from '../redux/passwords';
 import {showAlert} from '../redux/alert';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
@@ -74,16 +73,15 @@ function SearchResultsList(props) {
     // call action
     if (item.class === 'organization') {
       props.selectOrganization(item);
-      props.loadOrganizationPasswords(item);
     } else if (item.class === 'password') {
-      props.selectPasswordId(item.id);
+      props.setActiveComponent('password');
+      props.selectPassword(item);
       props.loadPasswordById(item.id);
+      props.hideSearchResult();
     } else {
       // this shouldn't happen
       props.showAlert('Invalid result selected.');
     }
-    props.hideSearchResult();
-    props.selectItem(item);
   }
 
   if (!props.searchResultOpen) {
@@ -135,9 +133,11 @@ SearchResultsList.propTypes = {
   selectItem: PropTypes.func,
   hideSearchResult: PropTypes.func,
   selectOrganization: PropTypes.func,
+  selectPassword: PropTypes.func,
   loadOrganizationPasswords: PropTypes.func,
-  selectPasswordId: PropTypes.func,
   loadPasswordById: PropTypes.func,
+  setActiveComponent: PropTypes.func,
+  setSearchContext: PropTypes.func,
 };
 
 SearchResultsList.defaultProps = {
@@ -149,11 +149,11 @@ export default connect(
   // state => ({...state.search})
   null,
   {
-    selectItem,
+    setActiveComponent,
     hideSearchResult,
+    selectPassword,
     selectOrganization,
-    selectPasswordId,
-    loadOrganizationPasswords,
     loadPasswordById,
     showAlert,
+    setSearchContext,
   })(SearchResultsList);

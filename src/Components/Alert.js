@@ -36,9 +36,28 @@ function Alert(props) {
       if (message.detail) {
         messageClean = `${messageClean} - ${message.detail}`;
       }
+    } else if (message.data) {
+      if (typeof message.data === 'string') {
+        messageClean = message.data;
+      } else if (message.data.error_message) {
+        messageClean = message.data.error_message;
+      } else if (message.data.error) {
+        messageClean = message.data.error;
+
+        if (message.data.status) {
+          messageClean = `${message.data.status} ${message.data.error}`;
+        }
+      }
+    } else if (message.statusText) {
+      messageClean = message.statusText;
     } else {
       messageClean = JSON.stringify(message);
     }
+  }
+
+  // one final fallback
+  if (typeof messageClean !== 'string') {
+    messageClean = JSON.stringify(messageClean);
   }
 
   return (
@@ -60,7 +79,7 @@ Alert.propTypes = {
   // actions
   dismissAlert: PropTypes.func,
 
-  message: PropTypes.string,
+  message: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   show: PropTypes.bool,
 };
 

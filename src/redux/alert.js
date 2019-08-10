@@ -3,8 +3,7 @@ const ALERT_HIDE = 'alert/ALERT_HIDE';
 
 const RESET = 'alert/RESET';
 
-
-const initialState = {
+export const initialState = {
   show: false,
   message: '',
 };

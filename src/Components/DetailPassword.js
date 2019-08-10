@@ -26,6 +26,7 @@ const useStyles = makeStyles(theme => {
   return {
     root: {
       padding: theme.spacing(1),
+      paddingTop: theme.spacing(1),
     },
     gridItem: {
       display: 'flex',
@@ -92,7 +93,10 @@ function DetailPassword(props) {
           setCopyMessage(message);
         })
         .catch(error => {
-          // @TODO catch these errors somehow
+          props.dispatch({
+            types: ['detail/COPY', 'detail/COPY_SUCCESS', 'detail/COPY_FAIL'],
+            promise: promise.catch(() => error),
+          });
         });
     };
   }
@@ -192,6 +196,8 @@ DetailPassword.propTypes = {
 
   passwordLoaded: PropTypes.bool,
   passwordLoading: PropTypes.bool,
+
+  dispatch: PropTypes.func,
 };
 
 DetailPassword.defaultProps = {
@@ -205,4 +211,4 @@ export default connect(state => ({
   password: state.passwords.password,
   passwordLoaded: state.passwords.passwordLoaded,
   passwordLoading: state.passwords.passwordLoading,
-}), null)(DetailPassword);
+}))(DetailPassword);

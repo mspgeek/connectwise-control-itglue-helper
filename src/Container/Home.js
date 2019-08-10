@@ -15,6 +15,7 @@ import {checkToken} from '../redux/auth';
 import AppBarHeader from '../Components/AppBarHeader';
 import SearchResultsList from '../Components/SearchResultsList';
 import SearchResultDetail from '../Components/SearchResultDetail';
+import SearchSelect from '../Components/SearchSelect';
 
 const theme = createMuiTheme({
   breakpoints: {
@@ -54,7 +55,7 @@ function Home(props) {
     token,
     loginPending,
     user: {subdomain},
-    selectedItem,
+    selectedPassword,
     searchResultOpen,
     searchLoaded,
     searchLoading,
@@ -63,12 +64,12 @@ function Home(props) {
   const classes = useStyles();
 
   useEffect(() => {
-    // if there's a saved token, check if it's valid
-    // @TODO need to check token is valid more often
-    if (!loggedIn && !loginPending && subdomain && token) {
-      props.checkToken();
-    }
-  });
+    // // if there's a saved token, check if it's valid
+    // // @TODO need to check token is valid more often
+    props.checkToken();
+
+    console.log('token changed', token);
+  }, [token]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -76,16 +77,19 @@ function Home(props) {
       <AppBarHeader/>
       <Container maxWidth="xl" className={classes.containerRoot}>
         <Alert/>
-        {!loggedIn &&
+        {!loggedIn && !loginPending &&
         <Login/>}
-        {loggedIn &&
-        <SearchResultsList
-          searchResultOpen={searchResultOpen}
-          searchResults={searchResults}
-          searchLoading={searchLoading}
-          searchLoaded={searchLoaded}
-        />}
-        {loggedIn && selectedItem &&
+        {loggedIn && !selectedPassword &&
+        <>
+          <SearchSelect/>
+          <SearchResultsList
+            searchResultOpen={searchResultOpen}
+            searchResults={searchResults}
+            searchLoading={searchLoading}
+            searchLoaded={searchLoaded}
+          />
+        </>}
+        {loggedIn && selectedPassword &&
         <SearchResultDetail/>}
       </Container>
     </ThemeProvider>
@@ -107,7 +111,7 @@ Home.propTypes = {
   searchResults: PropTypes.array,
   user: PropTypes.object,
   token: PropTypes.string,
-  selectedItem: PropTypes.object,
+  selectedPassword: PropTypes.object,
 };
 
 Home.defaultProps = {
@@ -120,7 +124,7 @@ Home.defaultProps = {
 
 export default connect(state => ({
   ...state.auth,
-  selectedItem: state.search.selectedItem,
+  selectedPassword: state.search.selectedPassword,
   searchResultOpen: state.search.searchResultOpen,
   searchResults: state.search.searchResults,
   searchLoading: state.search.searchLoading,

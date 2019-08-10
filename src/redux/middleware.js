@@ -12,13 +12,6 @@ export function promiseThunkMiddleware() {
 
     const {promise, types, ...rest} = action;
 
-    // @TODO save state to local storage?
-    // put after thunking middleware
-
-    saveStore(getState());
-    saveTokenFromStore(getState());
-
-
     if (!promise) {
       return next(action);
     }
@@ -54,5 +47,23 @@ export function errorHandler() {
       dispatch(showAlert(action.error));
     }
     return next(action);
+  };
+}
+
+export function cacheHandler() {
+  return ({dispatch, getState}) => next => action => {
+    const oldState = getState();
+    const oldToken = getState().auth.token;
+
+    next(action);
+
+    const newState = getState();
+    const newToken = getState().auth.token;
+
+    if (oldToken !== newToken) {
+      saveTokenFromStore(getState());
+    }
+    // @TODO make this semi-intelligent
+    saveStore(getState());
   };
 }
