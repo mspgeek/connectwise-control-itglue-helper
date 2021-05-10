@@ -19,7 +19,7 @@
     "@material-ui/icons": "^4.2.1",
     "@material-ui/styles": "^4.3.0",
     "clipboard-copy": "^3.1.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "node-itglue": "^1.0.1",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
